@@ -1,0 +1,60 @@
+.avatarWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+/* Тултип при наведении */
+.tooltip {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+
+.avatarWrapper:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: -38px;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+  .tooltip {
+      font-size: 12px;
+    }
+}

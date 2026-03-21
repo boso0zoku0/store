@@ -1,0 +1,379 @@
+/* Основная навигация */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.nav.scrolled {
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  background: rgba(var(--bg-rgb), 0.95);
+}
+
+.navContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Логотип */
+.logo {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.logo:hover {
+  transform: scale(1.02);
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.logoBadge {
+  font-size: 0.7rem;
+  color: var(--text);
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+/* Навигационный список */
+.navList {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1.5rem;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navLink:hover {
+  color: var(--accent);
+}
+
+.navLink.active {
+  color: var(--accent);
+}
+
+.navLink.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* Выпадающее меню */
+.dropdown {
+  position: relative;
+}
+
+.dropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdownIcon {
+  transition: transform 0.3s;
+}
+
+.dropdownIcon.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  box-shadow: var(--shadow);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.dropdownItem:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding-left: 2rem;
+}
+
+.dropdownItem.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* Действия (поиск, профиль, корзина) */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.searchBtn,
+.profileBtn,
+.cartBtn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchBtn:hover,
+.profileBtn:hover,
+.cartBtn:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.cartBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  transform: translate(25%, -25%);
+}
+
+/* Мобильное меню */
+.mobileMenuBtn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.mobileMenuBtn:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.mobileMenu {
+  display: none;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.mobileNavList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobileNavItem {
+  margin-bottom: 0.5rem;
+}
+
+.mobileNavLink {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 1.1rem;
+}
+
+.mobileNavLink:hover,
+.mobileNavLink.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.mobileCategoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.mobileCategoryHeader .mobileNavLink {
+  flex: 1;
+}
+
+.mobileDropdownIcon {
+  margin-right: 1rem;
+  transition: transform 0.3s;
+}
+
+.mobileDropdownIcon.rotated {
+  transform: rotate(180deg);
+}
+
+.mobileDropdown {
+  list-style: none;
+  margin: 0 0 0 1rem;
+  padding: 0;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobileDropdownItem {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.mobileDropdownItem:hover,
+.mobileDropdownItem.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding-left: 1.5rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .navList {
+    display: none;
+  }
+
+  .actions {
+    gap: 0.25rem;
+  }
+
+  .searchBtn,
+  .profileBtn {
+    display: none;
+  }
+
+  .mobileMenuBtn {
+    display: flex;
+  }
+
+  .mobileMenu {
+    display: block;
+  }
+
+  .navContainer {
+    padding: 0.75rem 1rem;
+  }
+
+  .logoText {
+    font-size: 1.25rem;
+  }
+
+  .logoBadge {
+    font-size: 0.6rem;
+  }
+}
+
+/* Десктоп ховеры */
+@media (min-width: 769px) {
+  .navLink {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .navLink::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+
+  .navLink:hover::before {
+    transform: translateX(0);
+  }
+
+  .navLink.active::before {
+    transform: translateX(0);
+  }
+}
