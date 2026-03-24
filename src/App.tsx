@@ -1,4 +1,4 @@
-import './App.css' // ← Стили только для этого компонента
+import './App.css'
 import Layers from "./components/Parallax/Parallax.tsx";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {Moon} from "lucide-react";
@@ -11,14 +11,29 @@ import ProductCards from "./components/ProductCard/ProductCard.tsx";
 import ModalPurchase from "./components/ModalPurchase/ModalPurchase.tsx";
 import Checkout from "./components/Checkout/Checkout.tsx";
 import {ToastContainer} from "react-toastify";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import Login from "./components/Auth/Login/Login.tsx";
+import Products from "./components/Example/ExampleProducts.tsx";
 
 function App() {
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains('dark')
-  );
+  const [isDark, setIsDark] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    return document.documentElement.classList.contains('dark');
+  });
+  // Применяем тему при загрузке
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+  }, [isDark]);
+
   const handleToggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
     setIsDark(!isDark);
   };
 
@@ -52,6 +67,8 @@ function App() {
             <Route path={"/cart"} element={<ShoppingCart/>}/>
             <Route path={"/nav"} element={<Navigation/>}/>
             <Route path={"/requisites"} element={<Requisites/>}/>
+            <Route path={"/"} element={<Login/>}/>
+            <Route path={"/p"} element={<Products/>}/>
           </Routes>
         </Router>
       </div>

@@ -12,8 +12,7 @@
   --accent-bg: rgba(170, 59, 255, 0.27);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -43,16 +42,16 @@
 
 
   /* Система цветов текста */
-  --text-primary: #1a1a1a;      /* Основной текст */
-  --text-secondary: #4a4a4a;    /* Второстепенный текст */
-  --text-tertiary: #6b6b6b;     /* Третичный (подписи, мета-инфа) */
-  --text-disabled: #9ca3af;     /* Неактивный текст */
+  --text-primary: #1a1a1a; /* Основной текст */
+  --text-secondary: #4a4a4a; /* Второстепенный текст */
+  --text-tertiary: #6b6b6b; /* Третичный (подписи, мета-инфа) */
+  --text-disabled: #9ca3af; /* Неактивный текст */
 
   /* Цвета для акцентов */
-  --text-accent: #2a5c8a;       /* Акцентный цвет (ссылки, важное) */
-  --text-success: #059669;      /* Успех */
-  --text-warning: #d97706;      /* Предупреждение */
-  --text-error: #dc2626;        /* Ошибка */
+  --text-accent: #2a5c8a; /* Акцентный цвет (ссылки, важное) */
+  --text-success: #059669; /* Успех */
+  --text-warning: #d97706; /* Предупреждение */
+  --text-error: #dc2626; /* Ошибка */
 
   /* Для тёмной темы */
   --text-primary-dark: #f3f4f6;
@@ -73,9 +72,9 @@
   --text-h: #08060d;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
-  --accent: #c0aeae;
+  --accent: #242d2f;
   --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  --accent-border: rgba(231, 218, 218, 0.76);
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 }
@@ -88,8 +87,8 @@
   --border: #2e303a;
   --code-bg: #1f2028;
   --accent: rgb(204, 201, 211);
-  --accent-bg: rgba(192, 132, 252, 0.15);
-  --accent-border: rgba(192, 132, 252, 0.5);
+  --accent-bg: rgb(204, 201, 211);
+  --accent-border: rgb(204, 201, 211);
   --social-bg: rgba(47, 48, 58, 0.5);
   --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 }
@@ -128,6 +127,7 @@ h1 {
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
@@ -137,6 +137,7 @@ h2 {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -166,8 +167,6 @@ code {
      - infinite — бесконечно повторять
   */
 }
-
-
 
 
 @keyframes subtleFloat {
@@ -232,4 +231,29 @@ ul, ol {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.button {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--border);
+  border: none;
+  border-radius: 40px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.button:hover {
+  color: #1f2028;
+  background: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--accent-border);
+}
+
+.button:active {
+  transform: translateY(0);
 }

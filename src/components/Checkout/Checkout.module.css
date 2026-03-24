@@ -1,0 +1,137 @@
+/* Checkout.module.css */
+
+/* Контейнер всей страницы */
+.checkoutContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Заголовок */
+.title {
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-h);
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* Форма */
+.form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--bg);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* Группа полей */
+.formGroup {
+  margin-bottom: 24px;
+}
+
+/* Метка (label) */
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+/* Поле ввода */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-family: var(--sans);
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input:hover {
+  border-color: var(--accent-border);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+/* Ошибка валидации */
+.inputError {
+  border-color: #dc2626;
+}
+
+.inputError:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.errorMessage {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Две колонки */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Кнопка отправки */
+.submitBtn {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--border);
+  border: none;
+  border-radius: 40px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.submitBtn:hover {
+  color: #1f2028;
+  background: var(--accent-border);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--accent-border);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .form {
+    padding: 24px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

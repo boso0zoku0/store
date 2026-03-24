@@ -1,0 +1,252 @@
+/* Login.module.css */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #0a0f1a 0%, #1a1f2e 50%, #0f172a 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+/* Луна */
+.container::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: 11%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255,245,200,0.9) 0%, rgba(255,235,180,0.3) 70%, rgba(255,225,150,0) 100%);
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: moonGlow 4s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+/* Звёзды (мелкие) */
+.container .star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+
+/* Горный силуэт снизу */
+.container .mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.4));
+  z-index: 0;
+}
+
+.container .mountains::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23333" /></svg>') repeat-x bottom;
+  background-size: 1800px 100px;
+  opacity: 0.4;
+}
+
+/* Облака */
+.container .cloud {
+  position: absolute;
+  background: rgba(255,255,240,0.15);
+  border-radius: 100px;
+  filter: blur(30px);
+  z-index: 0;
+  animation: cloudFloat 20s linear infinite;
+}
+
+.cloud1 {
+  top: 20%;
+  left: -10%;
+  width: 300px;
+  height: 100px;
+  animation-delay: 0s;
+}
+
+.cloud2 {
+  bottom: 25%;
+  right: -15%;
+  width: 400px;
+  height: 130px;
+  animation-direction: reverse;
+  animation-delay: -5s;
+}
+
+/* Карточка (стеклянная) */
+.card {
+  position: relative;
+  z-index: 2;
+  max-width: 420px;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: 32px;
+  padding: 40px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Заголовки */
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin: 0 0 32px 0;
+}
+
+/* Ошибка */
+.error {
+  background: rgba(220, 38, 38, 0.2);
+  border-left: 3px solid #ff6b6b;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #ffb3b3;
+  font-size: 14px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(4px);
+}
+
+/* Форма */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.3px;
+}
+
+.input {
+  padding: 14px 18px;
+  font-size: 16px;
+  font-family: var(--sans);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.input:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.input:focus {
+  color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 100);
+}
+
+/* Ссылка регистрации */
+.registerLink {
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 32px 0 0;
+}
+
+.link {
+  color: #ffb347;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #ff8c00;
+  text-decoration: underline;
+}
+
+/* Анимации */
+@keyframes moonGlow {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cloudFloat {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .card {
+    padding: 32px 24px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .input {
+    padding: 12px 16px;
+  }
+}
+
+/* Тёмная тема (если нужно переопределить) */
+:root.dark .card {
+  background: rgba(0, 0, 0, 0.6);
+}

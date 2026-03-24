@@ -179,22 +179,23 @@
 /* Кнопка оплаты */
 .checkoutBtn {
   width: 100%;
-  padding: 18px;
-  margin-top: 25px;
-  background: var(--accent);
+  padding: 14px 24px;
+  background: var(--border);
   border: none;
-  border-radius: 50px;
-  color: var(--bg);
-  font-size: 20px;
+  border-radius: 40px;
+  color: white;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  margin-top: 8px;
 }
 
 .checkoutBtn:hover {
+  color: #1f2028;
   background: var(--accent-border);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(170, 59, 255, 0.3);
+  box-shadow: 0 8px 20px var(--accent-border);
 }
 
 .checkoutBtn:active {
@@ -288,29 +289,6 @@
 .cartButton:hover {
   transform: scale(1.05);
   background: var(--accent-border);
-}
-
-/* Уведомление */
-.notification {
-  position: fixed;        /* фиксированное позиционирование относительно окна */
-  top: 20px;              /* отступ сверху */
-  right: 20px;            /* отступ справа — будет выезжать справа */
-  left: auto;             /* убираем left, чтобы не центрировать */
-  transform: none;        /* убираем трансформацию */
-  background: var(--bg);
-  border: 2px solid var(--accent);
-  border-radius: 8px;
-  padding: 12px 24px;
-  color: var(--text);
-  box-shadow: var(--shadow);
-  z-index: 9999;
-  animation: slideIn 0.3s ease forwards;
-  white-space: nowrap;
-}
-
-/* Класс для скрытия */
-.notification.hiding {
-  animation: slideOut 0.3s ease forwards;
 }
 
 /* Анимации */
