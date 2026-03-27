@@ -4,6 +4,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  margin-bottom: 38px;
 }
 
 .avatar {
@@ -45,7 +46,6 @@
 .avatarWrapper:hover .tooltip {
   opacity: 1;
   visibility: visible;
-  bottom: -38px;
 }
 
 /* Адаптивность для мобильных */

@@ -180,10 +180,10 @@
 .checkoutBtn {
   width: 100%;
   padding: 14px 24px;
-  background: var(--border);
+  background: var(--accent);
   border: none;
   border-radius: 40px;
-  color: white;
+  color: chocolate;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -192,8 +192,8 @@
 }
 
 .checkoutBtn:hover {
-  color: #1f2028;
   background: var(--accent-border);
+  color: chocolate;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px var(--accent-border);
 }

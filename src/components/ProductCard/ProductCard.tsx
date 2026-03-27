@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {useState, useRef, useEffect} from 'react';
 import axios from "axios";
 import type {CartItem} from "../interfaces.tsx";
+import LoginModal from "../Auth/Modal/Login.tsx";
 
 export default function ProductCards() {
   const navigate = useNavigate();
@@ -10,10 +11,22 @@ export default function ProductCards() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [activeProduct, setActiveProduct] = useState<CartItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchEnable, setSearchEnable] = useState('')
+  const [tip, setTip] = useState<CartItem[]>([])
+  const [load, setLoad] = useState(true)
+  const [isReqLogin, setIsReqLogin] = useState(false)
 
   const [hoverStates, setHoverStates] = useState<Record<number, boolean>>({});
   const [imageIndices, setImageIndices] = useState<Record<number, number>>({});
-
+  useEffect(() => {
+    axios.post(`/api/products/find?short_name=${searchEnable}`, {withCredentials: true})
+      .then((resp) => {
+        setTip(resp.data);
+        console.log('TIP:', resp.data); // ← логируем ответ, не состояние
+      })
+      .then(() => setLoad(false))
+      .catch(err => console.error(err));
+  }, [searchEnable]);
   useEffect(() => {
     setProductsLoading(true);
     axios.get("/api/products/")
@@ -24,6 +37,25 @@ export default function ProductCards() {
       .catch(err => console.error(err))
       .finally(() => setProductsLoading(false));
   }, []);
+  const handleAuth = async (slug: string) => {
+    try {
+      await axios.post(`/api/products/add/to-cart?slug=${slug}`,
+        {withCredentials: true}
+      );
+      setIsReqLogin(false)
+      window.open('/cart', '_blank')
+    } catch (error) {
+      if (error.status == 401) {
+        setIsReqLogin(true)
+      }
+    }
+  };
+
+const truncateText = (text: string) => {
+  return text.length > 50
+    ? `${text.slice(0, 50)}...`
+    : text;
+};
 
   const handleMouseEnter = (productId: number) => {
     setHoverStates(prev => ({...prev, [productId]: true}));
@@ -55,19 +87,6 @@ export default function ProductCards() {
     setImageIndices(prev => ({...prev, [productId]: index}));
   };
 
-  const handleRedirect = async (slug: string) => {
-    try {
-      await axios.post(`/api/products/add/to-cart?slug=${slug}`,
-        {},
-        {withCredentials: true}
-      );
-      navigate('/cart');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      navigate('/cart');
-    }
-  };
-
   const openModal = (product: CartItem) => {
     console.log('Opening modal for product:', product);
     setActiveProduct(product);
@@ -82,9 +101,44 @@ export default function ProductCards() {
   if (productsLoading) {
     return <div className={styles.loader}>Loading products...</div>;
   }
+  if (isReqLogin) {
+    return (
+      <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)}/>
+    )
+  }
 
   return (
     <>
+      <div className={styles.searchWrapper}>
+        <input
+          type="text"
+          className={styles.searchInput}
+          placeholder="Поиск товаров..."
+          value={searchEnable}
+          onChange={(e) => setSearchEnable(e.target.value)}
+        />
+      </div>
+      {/*{tip.length > 0 && !load &&(*/}
+      {/*  <div className={styles.searchSuggestions}>*/}
+      {/*    {tip.map((item) => (*/}
+      {/*      <div key={item.id} className={styles.suggestionItem}>*/}
+      {/*        {item.photos && item.photos[0] && (*/}
+      {/*          <img*/}
+      {/*            src={`/api/static/media/${item.photos[0]}`}*/}
+      {/*            alt={item.shortName || item.name}*/}
+      {/*            className={styles.suggestionImage}*/}
+      {/*          />*/}
+      {/*        )}*/}
+      {/*        <div className={styles.suggestionInfo}>*/}
+      {/*          <span className={styles.suggestionName}>*/}
+      {/*          {item.shortName || item.name}*/}
+      {/*          </span>*/}
+      {/*          <span className={styles.suggestionPrice}>{item.price} ₽</span>*/}
+      {/*        </div>*/}
+      {/*      </div>*/}
+      {/*    ))}*/}
+      {/*  </div>*/}
+      {/*)}*/}
       <div className={styles.productsGrid}>
         {products.map((product) => {
           const isHovering = hoverStates[product.id] || false;
@@ -97,7 +151,6 @@ export default function ProductCards() {
               className={styles.productCard}
               onMouseEnter={() => handleMouseEnter(product.id)}
               onMouseLeave={() => handleMouseLeave(product.id)}
-              onClick={() => openModal(product)}
             >
               <div className={styles.productImageWrapper}>
                 {isHovering && photos.length > 1 && (
@@ -128,6 +181,7 @@ export default function ProductCards() {
                   }
                   alt={product.name}
                   loading="lazy"
+                  onClick={() => openModal(product)}
                 />
 
                 {isHovering && photos.length > 1 && (
@@ -145,7 +199,7 @@ export default function ProductCards() {
               </div>
 
               <div className={styles.productInfo}>
-                <h3 className={styles.productTitle}>{product.name}</h3>
+                <h3 className={styles.productTitle}>{truncateText(product.name)}</h3>
                 <p className={styles.productDescription}>
                   {product.description?.type || ''}
                 </p>
@@ -155,7 +209,8 @@ export default function ProductCards() {
                   </span>
                   <button
                     className={styles.productButton}
-                    onClick={() => handleRedirect(product.slug)}
+                    onClick={() => handleAuth(product.slug)}
+
 
                   >
                     В корзину
@@ -211,7 +266,7 @@ export default function ProductCards() {
 
               <button
                 className="button"
-                onClick={() => handleRedirect(activeProduct.slug)}
+                onClick={() => handleAuth(activeProduct.slug)}
               >
                 Добавить в корзину
               </button>

@@ -116,19 +116,7 @@ export default function ShoppingCart() {
               </div>
 
               <div className={styles.cartItemControls}>
-                <button
-                  className={styles.quantityBtn}
-                  onClick={() => updateQuantity(item.Products.id, (item.quantity || 1) - 1)}
-                >
-                  −
-                </button>
                 <span className={styles.quantity}>{item.quantity || 1}</span>
-                <button
-                  className={styles.quantityBtn}
-                  onClick={() => updateQuantity(item.Products.id, (item.quantity || 1) + 1)}
-                >
-                  +
-                </button>
               </div>
 
               <div className={styles.cartItemTotal}>
@@ -164,7 +152,7 @@ export default function ShoppingCart() {
 
           <div className={styles.container}>
             <button
-              className={styles.checkoutBtn}
+              className="btn"
               onClick={handleRedirect}
             >
               Оплатить
