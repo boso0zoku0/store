@@ -2,18 +2,25 @@
 /* #root — ID элемента
 # :root — html тег корневой в данном случае*/
 /* .root - div classname = root */
+
+
+/* ========== БАЗОВЫЕ ПЕРЕМЕННЫЕ ========== */
 :root {
-  --text: #c4e764;
+  --text: #9ca3af;
   --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff; /* основной акцентный цвет */
-  --accent-hover: rgba(22, 27, 29, 0.24)
-  --accent-bg: rgba(170, 59, 255, 0.27);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg: #16171d;
+  --border: #2e303a;
+  --code-bg: #1f2028;
+  --accent: rgb(204, 201, 211);
+  --accent-hover: rgba(22, 27, 29, 0.24);
+  --accent-bg: rgb(204, 201, 211);
+  --accent-border: rgb(204, 201, 211);
+  --social-bg: rgba(47, 48, 58, 0.5);
+  --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  --btn-bg: var(--accent);
+  --btn-text: #f0f0f0;
+  --btn-hover-bg: var(--accent-border);
+  --btn-shadow: 0 8px 20px rgba(19, 227, 57, 0.81);
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -23,91 +30,199 @@
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
-  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Система размеров текста */
   font-size: 16px;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
-  --text-xl: 1.25rem; /* 20px */
+  --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
   --text-3xl: 1.875rem;
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
 
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-tertiary: #6b6b6b;
+  --text-disabled: #9ca3af;
 
-  /* Система цветов текста */
-  --text-primary: #1a1a1a; /* Основной текст */
-  --text-secondary: #4a4a4a; /* Второстепенный текст */
-  --text-tertiary: #6b6b6b; /* Третичный (подписи, мета-инфа) */
-  --text-disabled: #9ca3af; /* Неактивный текст */
+  --text-accent: #2a5c8a;
+  --text-success: #059669;
+  --text-warning: #d97706;
+  --text-error: #dc2626;
 
-  /* Цвета для акцентов */
-  --text-accent: #2a5c8a; /* Акцентный цвет (ссылки, важное) */
-  --text-success: #059669; /* Успех */
-  --text-warning: #d97706; /* Предупреждение */
-  --text-error: #dc2626; /* Ошибка */
-
-  /* Для тёмной темы */
   --text-primary-dark: #f3f4f6;
   --text-secondary-dark: #9ca3af;
   --text-tertiary-dark: #6b7280;
 
-
   @media (max-width: 1024px) {
     font-size: 16px;
   }
-}
-
-/*глобальная светлая тема для всего сайта(:root.dark - темная тема)*/
-:root {
-  /* Светлая тема */
-  --bg: #fff;
-  --text: #6b6375;
-  --text-h: rgba(8, 6, 13, 0.58);
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #242d2f;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(231, 218, 218, 0.76);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-  --btn-bg: var(--accent);
-  --btn-text: white;
-  --btn-hover-bg: var(--accent-border);
-  --btn-shadow: 0 8px 20px rgba(19, 227, 57, 0.81);
 
 }
 
-:root.dark {
-  /* Темная тема */
-  --bg: #16171d;
-  --text: #9ca3af;
-  --text-h: #f3f4f6;
-  --border: #2e303a;
-  --code-bg: #1f2028;
-  --accent: rgb(204, 201, 211);
-  --accent-bg: rgb(204, 201, 211);
-  --accent-border: rgb(204, 201, 211);
-  --social-bg: rgba(47, 48, 58, 0.5);
-  --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  --btn-bg: var(--accent);
-  --btn-text: #f0f0f0;
-  --btn-hover-bg: var(--accent-border);
-  --btn-shadow: 0 8px 20px rgba(19, 227, 57, 0.81);
+/* ========== ГЛОБАЛЬНЫЙ ФОН В СТИЛЕ HERO ========== */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(145deg, rgba(42, 36, 30, 0.56) 0%, #1E1915 50%, #0F0C0A 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  position: relative;
 }
 
-/* сделал кнопки в index.css чтобы легко управлять в зависимости от текущей темы */
+/* Вращающееся свечение */
+body::before {
+  content: '';
+  position: fixed;
+  top: 20%;
+  left: 20%;
+  width: 150%;
+  height: 150%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 30% 40%, rgba(198, 124, 78, 0.12), transparent 60%);
+  animation: rotateGlow 30s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Зернистость */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Текстурная сетка */
+.global-texture {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(198, 124, 78, 0.05) 0px, rgba(198, 124, 78, 0.05) 1px, transparent 1px, transparent 100px),
+    repeating-linear-gradient(0deg, rgba(198, 124, 78, 0.05) 0px, rgba(198, 124, 78, 0.05) 1px, transparent 1px, transparent 100px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Плавающие элементы */
+.floating-global {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.floating-icon {
+  position: absolute;
+  color: rgba(255, 215, 140, 0.2);
+  animation: floatGlobal 12s ease-in-out infinite;
+}
+
+/* Частицы */
+.global-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.global-particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(198, 124, 78, 0.4), rgba(198, 124, 78, 0.1));
+  border-radius: 50%;
+  animation: floatParticleGlobal 15s linear infinite;
+  opacity: 0;
+}
+
+/* Световые сферы */
+.glow-orb-global {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: -2;
+  animation: orbMoveGlobal 20s ease-in-out infinite;
+}
+
+.glow-orb-1-global {
+  background: radial-gradient(circle, rgba(198, 124, 78, 0.25), transparent);
+  top: 10%;
+  left: -150px;
+}
+
+.glow-orb-2-global {
+  background: radial-gradient(circle, rgba(255, 215, 140, 0.2), transparent);
+  bottom: 20%;
+  right: -150px;
+  animation-delay: -5s;
+}
+
+.glow-orb-3-global {
+  background: radial-gradient(circle, rgba(165, 93, 58, 0.15), transparent);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  animation: orbPulseGlobal 15s ease-in-out infinite;
+}
+
+/* Анимации */
+@keyframes rotateGlow {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes floatGlobal {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+  50% { transform: translateY(-30px) rotate(8deg); opacity: 0.6; }
+}
+
+@keyframes floatParticleGlobal {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 0.4; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+}
+
+@keyframes orbMoveGlobal {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(60px, 40px) scale(1.1); }
+  66% { transform: translate(-40px, 60px) scale(0.9); }
+}
+
+@keyframes orbPulseGlobal {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* ========== ОСТАЛЬНЫЕ СТИЛИ ========== */
 .btn {
   width: 100%;
   padding: 14px 24px;
-  background: green;
+  background: var(--text-success);
   border: none;
   border-radius: 40px;
   color: white;
@@ -122,41 +237,33 @@
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow);
 }
-
-/* Если кнопка disabled */
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
-
-/* Если кнопка активна */
 .btn:active {
   transform: translateY(0);
 }
 
-
-
-
 #root {
-  width: 1126px;
+  width: auto;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
-  /* линии по бокам */
-  /*border-inline: 1px solid var(--border);*/
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  position: relative;
+  z-index: 10;
 }
 
 body {
   margin: 0;
 }
 
-h1,
-h2 {
+h1, h2 {
   font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
@@ -166,7 +273,9 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
-  @media (max-width: 1024px) {
+}
+@media (max-width: 1024px) {
+  h1 {
     font-size: 36px;
     margin: 20px 0;
   }
@@ -177,7 +286,9 @@ h2 {
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
-  @media (max-width: 1024px) {
+}
+@media (max-width: 1024px) {
+  h2 {
     font-size: 20px;
   }
 }
@@ -186,8 +297,7 @@ p {
   margin: 0;
 }
 
-code,
-.counter {
+code, .counter {
   font-family: var(--mono);
   display: inline-flex;
   border-radius: 4px;
@@ -199,76 +309,6 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
-}
-
-/* изображение */
-.promo-image {
-  animation: floatRotate 15s ease-in-out infinite;
-  /* Параметры:
-     - floatRotate — имя анимации
-     - 6s — длительность одного цикла
-     - ease-in-out — плавное ускорение/замедление
-     - infinite — бесконечно повторять
-  */
-}
-
-
-@keyframes subtleFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg) scale(1);
-  }
-  33% {
-    transform: translateY(-5px) rotate(1deg) scale(1.02);
-  }
-  66% {
-    transform: translateY(5px) rotate(-1deg) scale(0.98);
-  }
-}
-
-
-/* Класс для элемента, который будет пульсировать */
-.pulse-subtle {
-  animation: gentlePulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  transform-origin: center; /* Важно! Обеспечивает плавность */
-}
-
-/* Определение анимации */
-@keyframes gentlePulse {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.03); /* мягкое увеличение */
-  }
-  50% {
-    transform: scale(0.98); /* мягкое уменьшение */
-  }
-  75% {
-    transform: scale(1.01); /* легкая коррекция */
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-
-/* Определяем саму анимацию */
-@keyframes floatRotate {
-  0% {
-    transform: translateX(0) rotate(0deg) scale(1);
-  }
-  25% {
-    transform: translateX(10%) rotate(5deg) scale(1.05);
-  }
-  50% {
-    transform: translateX(20%) rotate(0deg) scale(1);
-  }
-  75% {
-    transform: translateX(-10%) rotate(-5deg) scale(0.95);
-  }
-  100% {
-    transform: translateX(-20%) rotate(0deg) scale(1);
-  }
 }
 
 ul, ol {
@@ -290,16 +330,12 @@ ul, ol {
   transition: all 0.2s ease;
   margin-top: 8px;
 }
-
 .button:hover {
   color: #1f2028;
   background: var(--accent-border);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px var(--accent-border);
 }
-
 .button:active {
   transform: translateY(0);
 }
-
-

@@ -134,7 +134,7 @@
 }
 
 .removeBtn:hover {
-  background: #ff4444;
+  background: var(--text-error);
   color: white;
   transform: scale(1.1);
 }

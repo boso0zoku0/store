@@ -1,13 +1,21 @@
 import styles from './ProductCard.module.css'
-import {useNavigate} from "react-router-dom";
-import {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect, useMemo} from 'react';
 import axios from "axios";
 import type {CartItem} from "../interfaces.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
+import ProductFilters from "../ProductFulter/Filter.tsx";
+import type {FilterState} from "../ProductFulter/Filter.tsx";
 
 export default function ProductCards() {
-  const navigate = useNavigate();
   const [products, setProducts] = useState<CartItem[]>([]);
+  const [filteredProduct, setFilteredProducts] = useState<CartItem[]>([])
+  const [filters, setFilters] = useState({
+    categories: [],
+    priceRange: [0, 10000],
+    colors: [],
+    volume: [],
+    inStock: false,
+  });
   const [productsLoading, setProductsLoading] = useState(true);
   const [activeProduct, setActiveProduct] = useState<CartItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -15,6 +23,7 @@ export default function ProductCards() {
   const [tip, setTip] = useState<CartItem[]>([])
   const [load, setLoad] = useState(true)
   const [isReqLogin, setIsReqLogin] = useState(false)
+  const [priceFilterEnabled, setPriceFilterEnabled] = useState(true);
 
   const [hoverStates, setHoverStates] = useState<Record<number, boolean>>({});
   const [imageIndices, setImageIndices] = useState<Record<number, number>>({});
@@ -51,11 +60,11 @@ export default function ProductCards() {
     }
   };
 
-const truncateText = (text: string) => {
-  return text.length > 50
-    ? `${text.slice(0, 50)}...`
-    : text;
-};
+  const truncateText = (text: string) => {
+    return text.length > 50
+      ? `${text.slice(0, 50)}...`
+      : text;
+  };
 
   const handleMouseEnter = (productId: number) => {
     setHoverStates(prev => ({...prev, [productId]: true}));
@@ -107,8 +116,29 @@ const truncateText = (text: string) => {
     )
   }
 
+  const handlePriceFilterToggle = (enabled: boolean) => {
+    setPriceFilterEnabled(enabled);
+};
+  const handleFilterChange = async (filters: FilterState) => {
+    const filtersToSend = {...filters};
+
+    // Если фильтр по цене отключён — удаляем priceRange
+    if (!priceFilterEnabled) {
+      delete filtersToSend.priceRange;
+    }
+
+    // Если объём не выбран — удаляем volume
+    if (!filters.volume || filters.volume.length === 0) {
+      delete filtersToSend.volume;
+    }
+
+    const response = await axios.post('/api/products/filters/', filtersToSend, {withCredentials: true});
+    setProducts(response.data);
+  };
+
   return (
     <>
+      {/* Поисковая строка */}
       <div className={styles.searchWrapper}>
         <input
           type="text"
@@ -118,108 +148,98 @@ const truncateText = (text: string) => {
           onChange={(e) => setSearchEnable(e.target.value)}
         />
       </div>
-      {/*{tip.length > 0 && !load &&(*/}
-      {/*  <div className={styles.searchSuggestions}>*/}
-      {/*    {tip.map((item) => (*/}
-      {/*      <div key={item.id} className={styles.suggestionItem}>*/}
-      {/*        {item.photos && item.photos[0] && (*/}
-      {/*          <img*/}
-      {/*            src={`/api/static/media/${item.photos[0]}`}*/}
-      {/*            alt={item.shortName || item.name}*/}
-      {/*            className={styles.suggestionImage}*/}
-      {/*          />*/}
-      {/*        )}*/}
-      {/*        <div className={styles.suggestionInfo}>*/}
-      {/*          <span className={styles.suggestionName}>*/}
-      {/*          {item.shortName || item.name}*/}
-      {/*          </span>*/}
-      {/*          <span className={styles.suggestionPrice}>{item.price} ₽</span>*/}
-      {/*        </div>*/}
-      {/*      </div>*/}
-      {/*    ))}*/}
-      {/*  </div>*/}
-      {/*)}*/}
-      <div className={styles.productsGrid}>
-        {products.map((product) => {
-          const isHovering = hoverStates[product.id] || false;
-          const currentIndex = imageIndices[product.id] || 0;
-          const photos = product.photos || [];
 
-          return (
-            <div
-              key={product.id}
-              className={styles.productCard}
-              onMouseEnter={() => handleMouseEnter(product.id)}
-              onMouseLeave={() => handleMouseLeave(product.id)}
-            >
-              <div className={styles.productImageWrapper}>
-                {isHovering && photos.length > 1 && (
-                  <>
-                    <button
-                      className={`${styles.arrow} ${styles.arrowLeft}`}
-                      onClick={(e) => handlePrevImage(e, product.id, photos.length)}
-                      aria-label="Предыдущее фото"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      className={`${styles.arrow} ${styles.arrowRight}`}
-                      onClick={(e) => handleNextImage(e, product.id, photos.length)}
-                      aria-label="Следующее фото"
-                    >
-                      ›
-                    </button>
-                  </>
-                )}
+      {/* Основной контент: фильтры + товары */}
+      <div className={styles.catalogLayout}>
+        {/* Блок фильтров */}
+        <ProductFilters
+          onFilterChange={handleFilterChange}
+          priceFilterEnabled={priceFilterEnabled}
+          onPriceFilterToggle={handlePriceFilterToggle}
 
-                <img
-                  className={styles.productImage}
-                  src={
-                    photos[currentIndex]
-                      ? `/api/static/media/${photos[currentIndex]}`
-                      : '/placeholder.jpg'
-                  }
-                  alt={product.name}
-                  loading="lazy"
-                  onClick={() => openModal(product)}
-                />
+        />
 
-                {isHovering && photos.length > 1 && (
-                  <div className={styles.dots}>
-                    {photos.map((_, idx) => (
+        {/* Сетка товаров */}
+        <div className={styles.productsGrid}>
+          {products.map((product) => {
+            const isHovering = hoverStates[product.id] || false;
+            const currentIndex = imageIndices[product.id] || 0;
+            const photos = product.photos || [];
+
+            return (
+              <div
+                key={product.id}
+                className={styles.productCard}
+                onMouseEnter={() => handleMouseEnter(product.id)}
+                onMouseLeave={() => handleMouseLeave(product.id)}
+              >
+                <div className={styles.productImageWrapper}>
+                  {isHovering && photos.length > 1 && (
+                    <>
                       <button
-                        key={idx}
-                        className={`${styles.dot} ${currentIndex === idx ? styles.dotActive : ''}`}
-                        onClick={(e) => handleDotClick(e, product.id, idx)}
-                        aria-label={`Фото ${idx + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+                        className={`${styles.arrow} ${styles.arrowLeft}`}
+                        onClick={(e) => handlePrevImage(e, product.id, photos.length)}
+                        aria-label="Предыдущее фото"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        className={`${styles.arrow} ${styles.arrowRight}`}
+                        onClick={(e) => handleNextImage(e, product.id, photos.length)}
+                        aria-label="Следующее фото"
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
 
-              <div className={styles.productInfo}>
-                <h3 className={styles.productTitle}>{truncateText(product.name)}</h3>
-                <p className={styles.productDescription}>
-                  {product.description?.type || ''}
-                </p>
-                <div className={styles.productFooter}>
+                  <img
+                    className={styles.productImage}
+                    src={
+                      photos[currentIndex]
+                        ? `/api/static/media/${photos[currentIndex]}`
+                        : '/placeholder.jpg'
+                    }
+                    alt={product.name}
+                    loading="lazy"
+                    onClick={() => openModal(product)}
+                  />
+
+                  {isHovering && photos.length > 1 && (
+                    <div className={styles.dots}>
+                      {photos.map((_, idx) => (
+                        <button
+                          key={idx}
+                          className={`${styles.dot} ${currentIndex === idx ? styles.dotActive : ''}`}
+                          onClick={(e) => handleDotClick(e, product.id, idx)}
+                          aria-label={`Фото ${idx + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.productInfo}>
+                  <h3 className={styles.productTitle}>{truncateText(product.name)}</h3>
+                  <p className={styles.productDescription}>
+                    {product.description?.type || ''}
+                  </p>
+                  <div className={styles.productFooter}>
                   <span className={styles.productPrice}>
                     {typeof product.price === 'number' ? product.price.toFixed(3) : product.price} ₽
                   </span>
-                  <button
-                    className={styles.productButton}
-                    onClick={() => handleAuth(product.slug)}
-
-
-                  >
-                    В корзину
-                  </button>
+                    <button
+                      className={styles.productButton}
+                      onClick={() => handleAuth(product.slug)}
+                    >
+                      В корзину
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Модальное окно */}

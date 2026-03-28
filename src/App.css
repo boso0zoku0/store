@@ -228,40 +228,101 @@
 }
 
 
+
+
+
+
+
+
 .menu {
   width: 100%;
-  background: var(--bg);
-  padding: 1.5rem 0;
+  background: rgba(42, 36, 30, 0.85); /* полупрозрачный фон под фон сайта */
+  backdrop-filter: blur(12px); /* размытие для стеклянного эффекта */
+  border-bottom: 1px solid rgba(255, 215, 140, 0.2); /* тёплая светящаяся линия */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
+/* Эффект при скролле (опционально) */
+.menu.scrolled {
+  background: rgba(42, 36, 30, 0.95);
+  backdrop-filter: blur(16px);
+  border-bottom-color: rgba(198, 124, 78, 0.4);
+}
 
 .navContainer {
   display: flex;
-  justify-content: space-between; /* ← важно! */
+  justify-content: space-between;
   align-items: center;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 1rem 2rem;
 }
 
 .navLinks {
   display: flex;
-  gap: 2rem;  /* Расстояние между пунктами */
+  gap: 2.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .navLinks a {
-  color: var(--text);
+  color: #FFE6C7;
   text-decoration: none;
   font-size: 1rem;
-  transition: color 0.2s;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+/* Анимированное подчёркивание */
+.navLinks a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #C67C4E, #FFD78C);
+  transition: width 0.3s ease;
+}
+
+.navLinks a:hover::after {
+  width: 100%;
 }
 
 .navLinks a:hover {
-  color: var(--accent);
+  color: #FFD78C;
+  transform: translateY(-1px);
 }
+
+/* Активная ссылка (если нужно) */
+.navLinks a.active {
+  color: #FFD78C;
+}
+
+.navLinks a.active::after {
+  width: 100%;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+
+
+
+
+
+
 
 
 .profileLink {

@@ -4,7 +4,7 @@
   height: 100vh;
   width: 100%;
   overflow: hidden;
-  perspective: 1000px;
+  perspective: 700px;
 }
 
 .hero {
