@@ -41,7 +41,7 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
     "550+": [550, 1000],
   };
 
-  const volumes = Object.keys(volumeMap); // ["250-350", "350-450", ...]
+  const volumes = Object.keys(volumeMap);
 
   const handleCategoryChange = (category: string) => {
     const newCategories = filters.categories.includes(category)
@@ -63,12 +63,9 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
 
   const handleVolumeChange = (volumeLabel: string) => {
     const selectedRange = volumeMap[volumeLabel];
-
-    // Проверяем, выбран ли уже этот диапазон
     const isSelected = filters.volume.length === 2 &&
       filters.volume[0] === selectedRange[0] &&
       filters.volume[1] === selectedRange[1];
-
     const newVolume = isSelected ? [] : selectedRange;
 
     const newFilters = {...filters, volume: newVolume};
@@ -78,7 +75,8 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     let value = e.target.value;
-    let numValue = value.replace(',', '.');      // заменяем запятую на точку
+    let n = value.replace(',', '.');      // заменяем запятую на точку
+    let numValue = parseFloat(n)
 
     const newRange = [...filters.priceRange];
     newRange[index] = numValue;

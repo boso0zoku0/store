@@ -5,50 +5,76 @@ import type {CartItem} from "../interfaces.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
 import ProductFilters from "../ProductFulter/Filter.tsx";
 import type {FilterState} from "../ProductFulter/Filter.tsx";
+import {ProductStatus} from "./interfaces.tsx"
+import {useQuery} from "@tanstack/react-query";
 
 export default function ProductCards() {
-  const [products, setProducts] = useState<CartItem[]>([]);
-  const [filteredProduct, setFilteredProducts] = useState<CartItem[]>([])
-  const [filters, setFilters] = useState({
-    categories: [],
-    priceRange: [0, 10000],
-    colors: [],
-    volume: [],
-    inStock: false,
-  });
-  const [productsLoading, setProductsLoading] = useState(true);
   const [activeProduct, setActiveProduct] = useState<CartItem | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [searchEnable, setSearchEnable] = useState('')
-  const [tip, setTip] = useState<CartItem[]>([])
-  const [load, setLoad] = useState(true)
   const [isReqLogin, setIsReqLogin] = useState(false)
-  const [priceFilterEnabled, setPriceFilterEnabled] = useState(true);
-
+  const [priceFilterEnabled, setPriceFilterEnabled] = useState(true)
+  const [filters, setFilters] = useState<FilterState>({
+    categories: [],
+    volume: [],
+    colors: [],
+    priceRange: [0, 12000],
+    inStock: true,
+  });
   const [hoverStates, setHoverStates] = useState<Record<number, boolean>>({});
   const [imageIndices, setImageIndices] = useState<Record<number, number>>({});
-  useEffect(() => {
-    axios.post(`/api/products/find?short_name=${searchEnable}`, {withCredentials: true})
-      .then((resp) => {
-        setTip(resp.data);
-        console.log('TIP:', resp.data); // ← логируем ответ, не состояние
-      })
-      .then(() => setLoad(false))
-      .catch(err => console.error(err));
-  }, [searchEnable]);
-  useEffect(() => {
-    setProductsLoading(true);
-    axios.get("/api/products/")
-      .then((result) => {
-        console.log('Products loaded:', result.data);
-        setProducts(result.data);
-      })
-      .catch(err => console.error(err))
-      .finally(() => setProductsLoading(false));
-  }, []);
-  const handleAuth = async (slug: string) => {
+
+  const { data: products, isLoading, isFetching } = useQuery<CartItem[]>({
+    queryKey: ['products', filters, priceFilterEnabled],
+    queryFn: async () => {
+      const filtersToSend = { ...filters };
+
+      // Удаляем пустые фильтры
+      if (!filters.categories || filters.categories.length === 0) {
+      delete filtersToSend.categories;
+     }
+
+      // Если объём не выбран — удаляем поле
+      if (!filters.volume || filters.volume.length === 0) {
+        delete filtersToSend.volume;
+      }
+      if (!filters.colors || filters.colors.length === 0) {
+        delete filtersToSend.colors;
+      }
+
+      // Если фильтр по цене отключён — удаляем priceRange
+      if (!priceFilterEnabled) {
+        delete filtersToSend.priceRange;
+      }
+      const hasFilters = Object.keys(filtersToSend).length > 0;
+      if (hasFilters) {
+        console.log('📡 Запрос с фильтрами:', filtersToSend);
+        const { data } = await axios.post('/api/products/filters/', filtersToSend, {
+          withCredentials: true
+        });
+        return data;
+      } else {
+        console.log('📡 Запрос всех продуктов');
+        const { data } = await axios.get('/api/products/', {
+          withCredentials: true
+        });
+        return data;
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+
+
+  const handleAuth = async (slug: string, product_status: ProductStatus) => {
     try {
-      await axios.post(`/api/products/add/to-cart?slug=${slug}`,
+
+      await axios.post(`/api/products/add/to-cart`,
+        {slug, product_status},
         {withCredentials: true}
       );
       setIsReqLogin(false)
@@ -107,47 +133,28 @@ export default function ProductCards() {
     setActiveProduct(null);
   };
 
-  if (productsLoading) {
-    return <div className={styles.loader}>Loading products...</div>;
-  }
+
   if (isReqLogin) {
     return (
       <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)}/>
     )
   }
-
   const handlePriceFilterToggle = (enabled: boolean) => {
+    console.log(`Переключили : ${enabled}`)
     setPriceFilterEnabled(enabled);
-};
-  const handleFilterChange = async (filters: FilterState) => {
-    const filtersToSend = {...filters};
-
-    // Если фильтр по цене отключён — удаляем priceRange
-    if (!priceFilterEnabled) {
-      delete filtersToSend.priceRange;
-    }
-
-    // Если объём не выбран — удаляем volume
-    if (!filters.volume || filters.volume.length === 0) {
-      delete filtersToSend.volume;
-    }
-
-    const response = await axios.post('/api/products/filters/', filtersToSend, {withCredentials: true});
-    setProducts(response.data);
   };
+
+  if (isLoading) {
+    <div>Загрузка...</div>
+  }
+  if (isFetching) {
+    <div>Обновление...</div>
+  }
+
 
   return (
     <>
-      {/* Поисковая строка */}
-      <div className={styles.searchWrapper}>
-        <input
-          type="text"
-          className={styles.searchInput}
-          placeholder="Поиск товаров..."
-          value={searchEnable}
-          onChange={(e) => setSearchEnable(e.target.value)}
-        />
-      </div>
+
 
       {/* Основной контент: фильтры + товары */}
       <div className={styles.catalogLayout}>
@@ -161,7 +168,7 @@ export default function ProductCards() {
 
         {/* Сетка товаров */}
         <div className={styles.productsGrid}>
-          {products.map((product) => {
+          {products && products.map((product) => {
             const isHovering = hoverStates[product.id] || false;
             const currentIndex = imageIndices[product.id] || 0;
             const photos = product.photos || [];
@@ -226,11 +233,11 @@ export default function ProductCards() {
                   </p>
                   <div className={styles.productFooter}>
                   <span className={styles.productPrice}>
-                    {typeof product.price === 'number' ? product.price.toFixed(3) : product.price} ₽
+                     {product.price.toLocaleString('de-DE')} ₽
                   </span>
                     <button
                       className={styles.productButton}
-                      onClick={() => handleAuth(product.slug)}
+                      onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}
                     >
                       В корзину
                     </button>
@@ -253,9 +260,7 @@ export default function ProductCards() {
             <div className={styles.productDetails}>
               <h2>{activeProduct.name}</h2>
               <p className={styles.productPrice}>
-                {typeof activeProduct.price === 'number'
-                  ? activeProduct.price.toFixed(3)
-                  : activeProduct.price} ₽
+                {activeProduct.price.toLocaleString('de-DE')} ₽
               </p>
 
               {activeProduct.photos && activeProduct.photos.length > 0 && (
@@ -286,7 +291,7 @@ export default function ProductCards() {
 
               <button
                 className="button"
-                onClick={() => handleAuth(activeProduct.slug)}
+                onClick={() => handleAuth(activeProduct.slug, ProductStatus.PROCESSING)}
               >
                 Добавить в корзину
               </button>

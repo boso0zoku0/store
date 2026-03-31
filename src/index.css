@@ -27,7 +27,7 @@
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  letter-spacing: 1px;
   color-scheme: light dark;
   color: var(--text);
   font-synthesis: none;
@@ -233,6 +233,7 @@ body::after {
   margin-top: 8px;
 }
 .btn:hover {
+  color: black;
   background: var(--btn-hover-bg);
   transform: translateY(-2px);
   box-shadow: var(--btn-shadow);
@@ -338,4 +339,5 @@ ul, ol {
 }
 .button:active {
   transform: translateY(0);
+  box-sizing: border-box;  /* 👈 padding внутри ширины */
 }

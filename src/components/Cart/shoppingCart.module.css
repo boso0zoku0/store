@@ -5,14 +5,6 @@
   padding: 40px 20px;
 }
 
-/* Заголовок */
-.cartTitle {
-  font-size: 32px;
-  color: var(--text-h);
-  margin-bottom: 30px;
-  font-weight: 600;
-}
-
 /* Сетка контента */
 .cartContent {
   display: grid;
@@ -58,7 +50,7 @@
 
 .cartItemTitle {
   font-size: 18px;
-  color: var(--text-h);
+  color: var(--accent);
   margin: 0 0 8px 0;
   font-weight: 500;
 }
@@ -103,7 +95,7 @@
 .quantity {
   font-size: 18px;
   font-weight: 500;
-  color: var(--text-h);
+  color: var(--accent);
   min-width: 30px;
   text-align: center;
 }
@@ -112,7 +104,7 @@
 .cartItemTotal {
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-h);
+  color: var(--accent);
   min-width: 120px;
   text-align: right;
 }
@@ -123,7 +115,7 @@
   height: 36px;
   border: none;
   background: transparent;
-  color: var(--text);
+  color: var(--accent);
   font-size: 28px;
   cursor: pointer;
   border-radius: 50%;
@@ -135,7 +127,7 @@
 
 .removeBtn:hover {
   background: var(--text-error);
-  color: white;
+  color: var(--accent);
   transform: scale(1.1);
 }
 
@@ -150,19 +142,12 @@
   top: 20px;
 }
 
-.summaryTitle {
-  font-size: 24px;
-  color: var(--text-h);
-  margin: 0 0 20px 0;
-  font-weight: 600;
-}
-
 .summaryRow {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
   font-size: 18px;
-  color: var(--text);
+  color: var(--accent);
   border-bottom: 1px dashed var(--border);
 }
 

@@ -4,13 +4,15 @@ import styles from './shoppingCart.module.css';
 import {showToast} from "../ToastCheckout/Toast.tsx";
 import axios from "axios";
 import type {CartItem} from "./interfaces.tsx";
+import Login from "../Auth/Modal/Login.tsx";
 
 
 export default function ShoppingCart() {
-  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [login, setLogin] = useState(false)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -20,9 +22,13 @@ export default function ShoppingCart() {
         });
         console.log(response.data)
         setCartItems(response.data);
+        setLogin(false)
 
 
       } catch (err) {
+        if (err.status === 401) {
+          setLogin(true)
+        }
         console.error('Ошибка загрузки корзины:', err);
         setError('Не удалось загрузить корзину');
         setCartItems([]);
@@ -32,20 +38,29 @@ export default function ShoppingCart() {
     };
     fetchCart();
   }, []);
+  if (login) {
+    return (<Login isOpen={login} onClose={() => setLogin(false)}/>)
+  }
 
   const handleRedirect = () => {
     showToast.success('🎉 Переход к оформлению...');
     navigate('/checkout');
   };
+  const handlePayment = (slug: string, stat: string) => {
+    axios.post("/api/products/change/status",
+      {slug, stat},
+      {withCredentials: true}
+    )
+  }
 
   // Подсчёт общей суммы
   const totalAmount = cartItems.reduce((sum, item) => {
-  const price = item.Products?.price || 0;
-  const quantity = item.quantity || 0;
-  const subtotal = price * quantity;
-  console.log('price:', price, 'quantity:', quantity, 'subtotal:', subtotal);
-  return sum + subtotal;
-}, 0);
+    const price = item.Products?.price || 0;
+    const quantity = item.quantity || 0;
+    const subtotal = price * quantity;
+    console.log('price:', price, 'quantity:', quantity, 'subtotal:', subtotal);
+    return sum + subtotal;
+  }, 0);
   const updateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity < 1) return;
     setCartItems(items =>
@@ -55,9 +70,13 @@ export default function ShoppingCart() {
     );
   };
 
-  const removeItem = (id: number) => {
-    axios.delete(`/api/products/delete?product_id=${id}`, {withCredentials: true})
-    setCartItems(items => items.filter(item => item.Products.id !== id));
+  const removeItem = (slug: string, stat: string) => {
+    axios.post('/api/products/change/status',
+      {slug: slug, stat: stat},  // 👈 body
+      {withCredentials: true}
+    )
+    setCartItems(items => items.filter(item => item.Products.slug !== slug));
+    showToast.error(`${slug} удален из корзины`)
   };
 
   if (loading) {
@@ -111,7 +130,7 @@ export default function ShoppingCart() {
               <div className={styles.cartItemInfo}>
                 <h3 className={styles.cartItemTitle}>{item.Products.slug || 'Без названия'}</h3>
                 <span className={styles.cartItemPrice}>
-                  {(item.Products.price || 0).toFixed(3)} ₽
+                  {(item.Products.price.toLocaleString('de-DE') || 0)} ₽
                 </span>
               </div>
 
@@ -120,12 +139,12 @@ export default function ShoppingCart() {
               </div>
 
               <div className={styles.cartItemTotal}>
-                {((item.Products.price || 0) * (item.quantity || 1)).toFixed(3)} ₽
+                {((item.Products.price || 0) * (item.quantity || 1))} ₽
               </div>
 
               <button
                 className={styles.removeBtn}
-                onClick={() => removeItem(item.Products.id)}
+                onClick={() => removeItem(item.Products.slug, 'cancelled')}
                 aria-label="Удалить товар"
               >
                 ×
@@ -136,7 +155,7 @@ export default function ShoppingCart() {
 
         {/* Блок с итогом и кнопкой оплаты */}
         <div className={styles.cartSummary}>
-          <h2 className={styles.summaryTitle}>Итого</h2>
+          <h2 className={styles.summaryTotal}>Итого</h2>
 
           <div className={styles.summaryRow}>
             <span>Товаров:</span>
@@ -146,14 +165,14 @@ export default function ShoppingCart() {
           <div className={styles.summaryRow}>
             <span>Сумма:</span>
             <span className={styles.summaryTotal}>
-              {totalAmount.toFixed(3)} ₽
+              {totalAmount.toLocaleString('de-DE')} ₽
             </span>
           </div>
 
           <div className={styles.container}>
             <button
               className="btn"
-              onClick={handleRedirect}
+              onClick={() => handleRedirect()}
             >
               Оплатить
             </button>

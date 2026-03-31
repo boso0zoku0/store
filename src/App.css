@@ -221,24 +221,11 @@
 }
 
 
-.navActions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-
-
-
-
-
-
-
 .menu {
   width: 100%;
-  background: rgba(42, 36, 30, 0.85); /* полупрозрачный фон под фон сайта */
-  backdrop-filter: blur(12px); /* размытие для стеклянного эффекта */
-  border-bottom: 1px solid rgba(255, 215, 140, 0.2); /* тёплая светящаяся линия */
+  background: rgba(42, 36, 30, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 215, 140, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -246,7 +233,6 @@
   transition: all 0.3s ease;
 }
 
-/* Эффект при скролле (опционально) */
 .menu.scrolled {
   background: rgba(42, 36, 30, 0.95);
   backdrop-filter: blur(16px);
@@ -268,21 +254,40 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
-.navLinks a {
+.navLinks li {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.navLinks a,
+.navRight a {
   color: #FFE6C7;
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
-  letter-spacing: 0.3px;
+  letter-spacing: 3px;
   transition: all 0.2s ease;
   position: relative;
   padding-bottom: 4px;
+  display: inline-block;
+  line-height: normal;
 }
 
-/* Анимированное подчёркивание */
-.navLinks a::after {
+/* Анимация подчеркивания */
+.navLinks a::after,
+.navRight a::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -293,22 +298,15 @@
   transition: width 0.3s ease;
 }
 
-.navLinks a:hover::after {
+.navLinks a:hover::after,
+.navRight a:hover::after {
   width: 100%;
 }
 
-.navLinks a:hover {
+.navLinks a:hover,
+.navRight a:hover {
   color: #FFD78C;
   transform: translateY(-1px);
-}
-
-/* Активная ссылка (если нужно) */
-.navLinks a.active {
-  color: #FFD78C;
-}
-
-.navLinks a.active::after {
-  width: 100%;
 }
 
 .navActions {

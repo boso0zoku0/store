@@ -29,7 +29,7 @@ export default function Login() {
       form.append('username', formData.username);
       form.append('password', formData.password);
 
-      const response = await axios.post('/api/auth/login', form, {
+      const response = await axios.post('/api/users/login', form, {
         withCredentials: true
       });
       if (response.status === 200) {
