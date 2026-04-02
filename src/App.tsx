@@ -14,27 +14,17 @@ import Login from "./components/Auth/Login/Login.tsx";
 import Hero from "./components/Main/Main.tsx";
 import ProductFilters from "./components/ProductFulter/Filter.tsx";
 import Test from "./components/Example/Test.tsx";
+import Register from "./components/Auth/Registrations/Registrations.tsx";
+import Navbar from "./components/Navbar/Navbar.tsx";
+import {AuthProvider} from "./contexts/AuthContexts.tsx";
 
 function App() {
 
   return (
-    <>
-      <div>
-        <nav className="menu">
-          <div className="navContainer">
-            <ul className="navLinks">
-              <li><a href="/products">Изделия</a></li>
-              <li><a href="/cart">Корзина</a></li>
-              <li><a href="/requisites">Реквизиты Разработчика</a></li>
-            </ul>
-            <div className="navRight">
-              <a href="/profile" aria-label="Профиль">
-                Профиль
-              </a>
-            </div>
-          </div>
-        </nav>
-        <Router>
+    <AuthProvider>
+      <Router>
+        <div>
+          <Navbar/>
           <Routes>
             <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
             <Route path="/avatar" element={<Profile/>}/>
@@ -45,19 +35,18 @@ function App() {
             <Route path={"/nav"} element={<Navigation/>}/>
             <Route path={"/requisites"} element={<Requisites/>}/>
             <Route path={"/login"} element={<Login/>}/>
+            <Route path={"/register"} element={<Register/>}/>
             <Route path={"/profile"} element={<Profile/>}/>
             <Route path={"/"} element={<Hero/>}/>
             <Route path={"/test"} element={<Test/>}/>
             <Route path="/f" element={<ProductFilters onFilterChange={() => {
             }}/>}/>
-
+            {/* остальные маршруты */}
           </Routes>
-        </Router>
-      </div>
-      <ToastContainer
-        theme={'dark'}
-      />
-    </>
+          <ToastContainer theme="dark"/>
+        </div>
+      </Router>
+    </AuthProvider>
   )
 }
 

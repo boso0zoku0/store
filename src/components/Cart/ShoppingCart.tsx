@@ -2,9 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import styles from './shoppingCart.module.css';
 import {showToast} from "../ToastCheckout/Toast.tsx";
-import axios from "axios";
 import type {CartItem} from "./interfaces.tsx";
-import Login from "../Auth/Modal/Login.tsx";
+import api, {isAuthenticated} from "../../utils/auth.tsx";
+import LoginModal from "../Auth/Modal/Login.tsx";
 
 
 export default function ShoppingCart() {
@@ -17,18 +17,18 @@ export default function ShoppingCart() {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const response = await axios.get('/api/products/get/to-cart', {
-          withCredentials: true
-        });
-        console.log(response.data)
-        setCartItems(response.data);
-        setLogin(false)
+        if (isAuthenticated()) {
+          const response = await api.get('/products/get/to-cart');
+          console.log(response.data)
+          setCartItems(response.data);
+          setLogin(false)
 
 
-      } catch (err) {
-        if (err.status === 401) {
+        } else {
           setLogin(true)
+          setCartItems([]);
         }
+      } catch (err) {
         console.error('Ошибка загрузки корзины:', err);
         setError('Не удалось загрузить корзину');
         setCartItems([]);
@@ -39,7 +39,7 @@ export default function ShoppingCart() {
     fetchCart();
   }, []);
   if (login) {
-    return (<Login isOpen={login} onClose={() => setLogin(false)}/>)
+    return (<LoginModal isOpen={login} onClose={() => setLogin(false)}/>)
   }
 
   const handleRedirect = () => {
@@ -47,7 +47,7 @@ export default function ShoppingCart() {
     navigate('/checkout');
   };
   const handlePayment = (slug: string, stat: string) => {
-    axios.post("/api/products/change/status",
+    api.post("/products/change/status",
       {slug, stat},
       {withCredentials: true}
     )
@@ -71,7 +71,7 @@ export default function ShoppingCart() {
   };
 
   const removeItem = (slug: string, stat: string) => {
-    axios.post('/api/products/change/status',
+    api.post('/products/change/status',
       {slug: slug, stat: stat},  // 👈 body
       {withCredentials: true}
     )

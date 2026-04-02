@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Login.module.css';
 import Stars from "./Stars.tsx";
+import api, {setTokens} from "../../../utils/auth.tsx";
+import {useAuth} from "../../../contexts/AuthContexts.tsx";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();  // 👈 берем login из контекста
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -29,10 +32,13 @@ export default function Login() {
       form.append('username', formData.username);
       form.append('password', formData.password);
 
-      const response = await axios.post('/api/users/login', form, {
+      const response = await api.post('/auth/login', form, {
         withCredentials: true
       });
       if (response.status === 200) {
+        setTokens(response.data.access_token, response.data.refresh_token);
+        login(response.data.user)
+        console.log(`положил `)
         navigate('/products');
       }
     } catch (err: any) {

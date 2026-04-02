@@ -1,35 +1,14 @@
 // pages/Profile.tsx
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
-import {Mail, Phone, Calendar, Package, Heart, Settings, LogOut, Edit, MessageCircle, Clock} from 'lucide-react';
+import {Calendar, Clock, Edit, Heart, LogOut, Mail, MessageCircle, Package, Phone, Settings} from 'lucide-react';
 import styles from './Profile.module.css';
-import axios from "axios";
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
+import api from "../../utils/auth.tsx";
+import type {GeneralData} from "./interfaces.tsx";
 
-interface OrderData {
-  id: number;
-  short_name: string;
-  status: 'processing' | 'moving' | 'completed' | 'cancelled' | 'none'
-  created_at: string;
-  price: number;
-  photo: string[];
-  quantity: number;
-}
-
-
-interface GeneralData {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  avatar: string;
-  date_registration: string;
-  total_orders: number;
-  total_price: number;
-  products_info: OrderData[];
-}
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -39,9 +18,7 @@ export default function Profile() {
   const {data, isLoading} = useQuery<GeneralData>({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await axios.get('/api/users/get', {
-        withCredentials: true
-      });
+      const response = await api.get('/users/get');
       return response.data
     },
     staleTime: 1000 * 60 * 10,

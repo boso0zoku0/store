@@ -1,70 +1,148 @@
+.catalogLayout {
+  display: flex;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
+.productsGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* ======================================== */
+/* 🌟 ГЛАВНАЯ КАРТОЧКА ТОВАРА С АНИМАЦИЕЙ 🌟 */
+/* ======================================== */
 .productCard {
-  max-width: 320px;
+  position: relative;
   border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(20, 25, 40, 0.7);
+  backdrop-filter: blur(10px);
   overflow: hidden;
   cursor: pointer;
-  display: flex;           /* ← добавить */
-  flex-direction: column;  /* ← добавить */
-  height: 500px;              /* ← меняем на auto */
-
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  border: 1px solid rgba(255, 215, 140, 0.15);
 }
 
+/* Анимированная переливающаяся рамка */
+.cardBorder {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    #ffd78c,
+    #c67c4e,
+    #ff8c00,
+    #ffd78c,
+    #c67c4e,
+    #ff8c00
+  );
+  background-size: 300% 100%;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+  animation: borderMove 3s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+}
 
-/* Эффект при наведении на карточку */
+/* Свечение при наведении */
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 215, 140, 0.25),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .productCard:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  transform: translateY(-4px);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 30px 50px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 215, 140, 0.4);
 }
 
-/* Контейнер для изображения */
+.productCard:hover .cardBorder {
+  opacity: 1;
+}
+
+.productCard:hover .cardGlow {
+  opacity: 1;
+}
+
+/* Отслеживание мыши для свечения */
+.productCard {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+.productCard:hover {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+@keyframes borderMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .productImageWrapper {
   position: relative;
   overflow: hidden;
   aspect-ratio: 1 / 1;
-  background: #f5f5f5;
+  background: linear-gradient(145deg, #1a1f2e, #0f1420);
   flex-shrink: 0;
 }
 
-/* Само изображение */
 .productImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Увеличение изображения при наведении */
 .productCard:hover .productImage {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
-/* Блок с информацией о товаре */
 .productInfo {
   padding: 20px;
-  background: white;
-  flex: 1;                 /* ← добавить — занимает всё оставшееся место */
-  display: flex;           /* ← добавить */
-  flex-direction: column;  /* ← добавить */
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(5px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Заголовок товара */
 .productTitle {
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #ffd78c;
   line-height: 1.4;
 }
 
-/* Описание товара */
 .productDescription {
   margin: 0 0 16px 0;
-  font-size: 14px;
-  color: #666;
+  font-size: 13px;
+  color: rgba(255, 255, 240, 0.7);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -72,7 +150,6 @@
   overflow: hidden;
 }
 
-/* Нижняя часть карточки */
 .productFooter {
   display: flex;
   align-items: center;
@@ -80,47 +157,35 @@
   margin-top: auto;
 }
 
-/* Цена */
 .productPrice {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: #2a5c8a;
+  background: linear-gradient(135deg, #ffd78c, #c67c4e);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
-/* Кнопка "В корзину" */
 .productButton {
-  padding: 8px 16px;
-  background: transparent;
-  border: 2px solid #2a5c8a;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #c67c4e, #a55d3a);
+  border: none;
   border-radius: 30px;
-  color: #2a5c8a;
+  color: white;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-/* Эффект при наведении на кнопку */
 .productButton:hover {
-  background: #2a5c8a;
-  color: white;
   transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(198, 124, 78, 0.4);
 }
 
-/* Эффект при клике на кнопку */
 .productButton:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
-
-/* Сетка для карточек товаров */
-.productsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-  padding: 24px;
-  margin-top: 30px;
-}
-
 
 /* Стрелки навигации */
 .arrow {
@@ -129,10 +194,11 @@
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
-  background: rgba(0, 0, 0, 0.5);
-  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 215, 140, 0.3);
   border-radius: 50%;
-  color: white;
+  color: #ffd78c;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -141,23 +207,17 @@
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 10;
-  backdrop-filter: blur(4px);
 }
 
 .arrow:hover {
-  background: var(--accent);
+  background: #c67c4e;
+  color: white;
   transform: translateY(-50%) scale(1.1);
 }
 
-.arrowLeft {
-  left: 12px;
-}
+.arrowLeft { left: 12px; }
+.arrowRight { right: 12px; }
 
-.arrowRight {
-  right: 12px;
-}
-
-/* Точки-индикаторы */
 .dots {
   position: absolute;
   bottom: 16px;
@@ -167,35 +227,26 @@
   gap: 8px;
   z-index: 10;
   background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   padding: 6px 12px;
   border-radius: 20px;
-  backdrop-filter: blur(4px);
 }
 
 .dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.5);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 0;
-}
-
-.dot:hover {
-  background: white;
-  transform: scale(1.2);
 }
 
 .dotActive {
-  background: var(--accent);
+  background: #c67c4e;
   width: 20px;
   border-radius: 4px;
 }
-
-
-
 
 /* Модальное окно */
 .modalOverlay {
@@ -204,25 +255,27 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  animation: fadeIn 0.2s ease-in;
+  animation: fadeIn 0.2s ease;
 }
 
 .modalContent {
-  background: white;
-  border-radius: 12px;
+  background: rgba(20, 25, 40, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
   max-width: 800px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
   padding: 30px;
-  animation: slideUp 0.3s ease-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 215, 140, 0.2);
+  animation: slideUp 0.3s ease;
 }
 
 .modalClose {
@@ -233,9 +286,8 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
-  transition: color 0.2s;
-  z-index: 10;
+  color: #ffd78c;
+  transition: all 0.2s;
   width: 40px;
   height: 40px;
   display: flex;
@@ -245,21 +297,15 @@
 }
 
 .modalClose:hover {
-  color: #000;
-  background-color: #f0f0f0;
-}
-
-.productDetails {
-  margin-top: 10px;
+  background: rgba(255, 215, 140, 0.2);
+  transform: rotate(90deg);
 }
 
 .productDetails h2 {
-  margin-bottom: 10px;
+  color: #ffd78c;
   font-size: 28px;
-  color: #333;
-  padding-right: 30px;
+  margin-bottom: 10px;
 }
-
 
 .productImages {
   display: grid;
@@ -270,73 +316,37 @@
 
 .detailImage {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
+  border-radius: 16px;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.productAbout {
-  line-height: 1.6;
-  margin: 20px 0;
-  color: #555;
-  font-size: 16px;
 }
 
 .productSpecs {
-  background: #f9f9f9;
+  background: rgba(255, 255, 255, 0.05);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 16px;
   margin: 20px 0;
 }
 
 .productSpecs h3 {
+  color: #ffd78c;
   margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
 }
 
 .productSpecs p {
+  color: rgba(255, 255, 240, 0.8);
   margin: 8px 0;
-  font-size: 14px;
-  color: #666;
 }
 
-
-.modalLoader {
+.loader {
   text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: #666;
-}
-
-.notFound {
-  text-align: center;
-  padding: 40px;
-}
-
-.notFound p {
-  margin-bottom: 20px;
-  font-size: 18px;
-  color: #666;
-}
-
-.notFound button {
-  padding: 10px 20px;
-  background-color: #666;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 100px;
+  font-size: 24px;
+  color: #ffd78c;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
@@ -350,37 +360,12 @@
   }
 }
 
-
-
-
-
-
-
-
-
-.catalogLayout {
-  display: flex;
-  gap: 2rem;
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-/* Обнови стили для productsGrid (если нужно) */
-.productsGrid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Адаптивность для мобильных */
 @media (max-width: 768px) {
   .catalogLayout {
     flex-direction: column;
   }
-
   .productsGrid {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
   }
 }
