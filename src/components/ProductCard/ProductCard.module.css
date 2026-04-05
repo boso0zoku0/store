@@ -1,9 +1,10 @@
 .catalogLayout {
   display: flex;
   gap: 2rem;
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 2rem auto;
   padding: 0 1rem;
+  align-items: start;
 }
 
 .productsGrid {
@@ -45,10 +46,10 @@
     #ff8c00
   );
   background-size: 300% 100%;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask-composite: exclude;
   pointer-events: none;
   animation: borderMove 3s linear infinite;
   opacity: 0;
@@ -198,7 +199,7 @@
   backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 215, 140, 0.3);
   border-radius: 50%;
-  color: #ffd78c;
+  color: rgba(224, 221, 216, 0.42);
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -218,35 +219,7 @@
 .arrowLeft { left: 12px; }
 .arrowRight { right: 12px; }
 
-.dots {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  padding: 6px 12px;
-  border-radius: 20px;
-}
 
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dotActive {
-  background: #c67c4e;
-  width: 20px;
-  border-radius: 4px;
-}
 
 /* Модальное окно */
 .modalOverlay {

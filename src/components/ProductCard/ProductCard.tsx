@@ -32,10 +32,10 @@ export default function ProductCards() {
   const [hoverStates, setHoverStates] = useState<Record<number, boolean>>({});
   const [imageIndices, setImageIndices] = useState<Record<number, number>>({});
 
-  const { data: products, isLoading, isFetching } = useQuery<CartItem[]>({
+  const {data: products, isLoading, isFetching} = useQuery<CartItem[]>({
     queryKey: ['products', filters, priceFilterEnabled],
     queryFn: async () => {
-      const filtersToSend = { ...filters };
+      const filtersToSend = {...filters};
 
       if (!filters.categories?.length) delete filtersToSend.categories;
       if (!filters.volume?.length) delete filtersToSend.volume;
@@ -44,10 +44,10 @@ export default function ProductCards() {
 
       const hasFilters = Object.keys(filtersToSend).length > 0;
       if (hasFilters) {
-        const { data } = await api.post('/products/filters/', filtersToSend);
+        const {data} = await api.post('/products/filters/', filtersToSend);
         return data;
       } else {
-        const { data } = await api.get('/products');
+        const {data} = await api.get('/products');
         return data;
       }
     },
@@ -60,17 +60,17 @@ export default function ProductCards() {
     if (products && products.length > 0 && !isLoading) {
       gsap.fromTo(
         `.${styles.productCard}`,
-        { opacity: 0, y: 50, scale: 0.9 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.08, ease: 'back.out(0.6)' }
+        {opacity: 0, y: 50, scale: 0.9},
+        {opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.08, ease: 'back.out(0.6)'}
       );
     }
   }, [products, isLoading]);
 
   const handleAuth = async (slug: string, product_status: ProductStatus) => {
     try {
-      await api.post(`/products/add/to-cart`, { slug, product_status }, { withCredentials: true });
+      await api.post(`/products/add/to-cart`, {slug, product_status}, {withCredentials: true});
       setIsReqLogin(false);
-      window.open('/cart', '_blank');
+      window.open('/cart');
     } catch (error: any) {
       if (error.status === 401) {
         setIsReqLogin(true);
@@ -81,34 +81,36 @@ export default function ProductCards() {
   const truncateText = (text: string) => text.length > 50 ? `${text.slice(0, 50)}...` : text;
 
   const handleMouseEnter = (productId: number) => {
-    setHoverStates(prev => ({ ...prev, [productId]: true }));
+    setHoverStates(prev => ({...prev, [productId]: true}));
   };
 
   const handleMouseLeave = (productId: number) => {
-    setHoverStates(prev => ({ ...prev, [productId]: false }));
-    setImageIndices(prev => ({ ...prev, [productId]: 0 }));
+    setHoverStates(prev => ({...prev, [productId]: false}));
+    setImageIndices(prev => ({...prev, [productId]: 0}));
   };
 
   const handlePrevImage = (e: React.MouseEvent, productId: number, photosLength: number) => {
     e.stopPropagation();
-    setImageIndices(prev => ({
-      ...prev,
-      [productId]: (prev[productId] - 1 + photosLength) % photosLength,
-    }));
+
+    setImageIndices(prev => {
+      const current = prev[productId] ?? 0;  // 👈 значение по умолчанию 0
+      const next = (current - 1 + photosLength) % photosLength;
+      console.log(`Назад: текущий ${current} → новый ${next}`);
+      return {...prev, [productId]: next};
+    });
   };
 
   const handleNextImage = (e: React.MouseEvent, productId: number, photosLength: number) => {
     e.stopPropagation();
-    setImageIndices(prev => ({
-      ...prev,
-      [productId]: (prev[productId] + 1) % photosLength,
-    }));
+
+    setImageIndices(prev => {
+      const current = prev[productId] ?? 0;  // 👈 значение по умолчанию 0
+      const next = (current + 1) % photosLength;
+      console.log(`Вперед: текущий ${current} → новый ${next}`);
+      return {...prev, [productId]: next};
+    });
   };
 
-  const handleDotClick = (e: React.MouseEvent, productId: number, index: number) => {
-    e.stopPropagation();
-    setImageIndices(prev => ({ ...prev, [productId]: index }));
-  };
 
   const openModal = (product: CartItem) => {
     setActiveProduct(product);
@@ -125,7 +127,7 @@ export default function ProductCards() {
   };
 
   if (isReqLogin) {
-    return <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)} />;
+    return <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)}/>;
   }
 
   if (isLoading) {
@@ -144,7 +146,7 @@ export default function ProductCards() {
         <div className={styles.productsGrid}>
           {products?.map((product) => {
             const isHovering = hoverStates[product.id] || false;
-            const currentIndex = imageIndices[product.id] || 0;
+            const currentIndex = imageIndices[product.id] ?? 0;
             const photos = product.photos || [];
 
             return (
@@ -155,8 +157,8 @@ export default function ProductCards() {
                 onMouseLeave={() => handleMouseLeave(product.id)}
               >
                 {/* Анимированная переливающаяся рамка */}
-                <div className={styles.cardBorder} />
-                <div className={styles.cardGlow} />
+                <div className={styles.cardBorder}/>
+                <div className={styles.cardGlow}/>
 
                 <div className={styles.productImageWrapper}>
                   {isHovering && photos.length > 1 && (
@@ -185,12 +187,10 @@ export default function ProductCards() {
                   />
 
                   {isHovering && photos.length > 1 && (
-                    <div className={styles.dots}>
+                    <div>
                       {photos.map((_, idx) => (
                         <button
                           key={idx}
-                          className={`${styles.dot} ${currentIndex === idx ? styles.dotActive : ''}`}
-                          onClick={(e) => handleDotClick(e, product.id, idx)}
                         />
                       ))}
                     </div>
@@ -202,7 +202,8 @@ export default function ProductCards() {
                   <p className={styles.productDescription}>{product.description?.type || ''}</p>
                   <div className={styles.productFooter}>
                     <span className={styles.productPrice}>{product.price.toLocaleString('de-DE')} ₽</span>
-                    <button className={styles.productButton} onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}>
+                    <button className={styles.productButton}
+                            onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}>
                       В корзину
                     </button>
                   </div>
@@ -224,7 +225,8 @@ export default function ProductCards() {
               {activeProduct.photos && activeProduct.photos.length > 0 && (
                 <div className={styles.productImages}>
                   {activeProduct.photos.map((photo, idx) => (
-                    <img key={idx} src={`/api/static/media/${photo}`} alt={`${activeProduct.name} ${idx + 1}`} className={styles.detailImage} />
+                    <img key={idx} src={`/api/static/media/${photo}`} alt={`${activeProduct.name} ${idx + 1}`}
+                         className={styles.detailImage}/>
                   ))}
                 </div>
               )}
@@ -239,7 +241,9 @@ export default function ProductCards() {
                   <p><strong>Особенности:</strong> {activeProduct.description.specificity || 'Не указан'}</p>
                 </div>
               )}
-              <button className="button" onClick={() => handleAuth(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину</button>
+              <button className="button"
+                      onClick={() => handleAuth(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину
+              </button>
             </div>
           </div>
         </div>

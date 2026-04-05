@@ -1,0 +1,31 @@
+/* ChatButton.module.css */
+.chatButton {
+  position: fixed;   /* 👈 ОБЯЗАТЕЛЬНО fixed, не absolute */
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;  /* 👈 высокий z-index */
+  background: #C47A4E;
+}
+
+.clientChat {
+  background: #C47A4E;
+}
+
+.assistantChat {
+  background: #2A5C8A;
+}
+
+.chatIcon {
+  width: 28px;
+  height: 28px;
+  color: white;
+  fill: white;
+}

@@ -2,7 +2,7 @@ import styles from "./Navbar.module.css"
 import {useAuth} from "../../contexts/AuthContexts.tsx";
 
 export default function Navbar() {
-  const {isAuthenticated, user, isLoading, logout} = useAuth();
+  const {isAuthenticated, isLoading} = useAuth();
   if (isLoading) {
     return <div className="navRight">Загрузка...</div>;
   }

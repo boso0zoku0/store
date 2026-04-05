@@ -1,5 +1,5 @@
 // contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {createContext, useContext, useState, useEffect, ReactNode} from 'react';
 import {
   fetchUserData,
   clearTokens,
@@ -17,33 +17,40 @@ interface AuthContextType {
   login: (userData: User) => void;    // вход
   logout: () => Promise<void>;    // выход
   updateUser: (userData: Partial<User>) => void;  // обновление данных
+  user_role: string;
+  isAuth: boolean
 }
 
 // Создаем контекст
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Провайдер
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({children}: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Инициализация при загрузке приложения
+
   useEffect(() => {
     const initAuth = async () => {
       const hasToken = checkAuth();
-
       if (hasToken) {
+        console.log('🔍 fetching user data...');
         const userData = await fetchUserData();
+        console.log('🔍 userData:', userData);
+
         if (userData) {
+          console.log('🔍 fetching user role...');
+          console.log('🔍 role:', userData.user_role);
           setUser(userData);
           setIsAuthenticated(true);
         } else {
-          // Токен есть, но пользователь не получен → токен невалидный
+          console.warn('⚠️ Token exists but user data fetch failed');
           clearTokens();
           setIsAuthenticated(false);
           setUser(null);
         }
+      } else {
       }
 
       setIsLoading(false);
@@ -68,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Обновление данных пользователя (после редактирования профиля)
   const updateUser = (userData: Partial<User>) => {
     if (user) {
-      setUser({ ...user, ...userData });
+      setUser({...user, ...userData});
     }
   };
 
@@ -78,7 +85,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isLoading,
     login,
     logout,
-    updateUser
+    updateUser,
+
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

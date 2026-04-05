@@ -1,12 +1,12 @@
 import axios from 'axios';
 import type {User} from "../interfaces/user.tsx"
-import LoginModal from "../components/Auth/Modal/Login.tsx";
 
 // ✅ Функция для проверки наличия токена
 export function isAuthenticated() {
   const token = getAccessToken();
   return token !== null && token !== undefined && token !== '';
 }
+
 
 // ✅ Функция для установки токенов
 export function setTokens(accessToken: string, refreshToken: string) {
@@ -27,9 +27,7 @@ export const getRefreshToken = () => localStorage.getItem('refresh_token');
 // Получение данных пользователя
 export const fetchUserData = async (): Promise<User | null> => {
   try {
-    const response = await api.get('/users/get', {
-      withCredentials: true
-    });
+    const response = await api.get('/users/me');
     return response.data;
   } catch (error) {
     console.error('Ошибка загрузки пользователя:', error);
@@ -37,10 +35,9 @@ export const fetchUserData = async (): Promise<User | null> => {
   }
 };
 
-// TODO
 export const logout = async () => {
   try {
-    await api.post('/auth/logout', {}, { withCredentials: true });
+    await api.post('/auth/logout', {});
   } catch (error) {
     console.error('Ошибка при выходе:', error);
   } finally {
@@ -98,7 +95,7 @@ api.interceptors.response.use(
         // Refresh token истек - очищаем и редирект
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+        // window.location.href = '/login';
         return Promise.reject(error);
       }
 

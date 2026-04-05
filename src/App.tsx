@@ -17,6 +17,8 @@ import Test from "./components/Example/Test.tsx";
 import Register from "./components/Auth/Registrations/Registrations.tsx";
 import Navbar from "./components/Navbar/Navbar.tsx";
 import {AuthProvider} from "./contexts/AuthContexts.tsx";
+import ChatWebsocket from "./components/WebSocket/MainWs.tsx";
+import Layout from "./components/Layout.tsx";
 
 function App() {
 
@@ -24,24 +26,25 @@ function App() {
     <AuthProvider>
       <Router>
         <div>
-          <Navbar/>
           <Routes>
-            <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
-            <Route path="/avatar" element={<Profile/>}/>
-            <Route path="/page" element={<Layers/>}/>
-            <Route path="/products" element={<ProductCards/>}/>
-            <Route path="/checkout" element={<Checkout/>}/>
-            <Route path={"/cart"} element={<ShoppingCart/>}/>
-            <Route path={"/nav"} element={<Navigation/>}/>
-            <Route path={"/requisites"} element={<Requisites/>}/>
-            <Route path={"/login"} element={<Login/>}/>
-            <Route path={"/register"} element={<Register/>}/>
-            <Route path={"/profile"} element={<Profile/>}/>
-            <Route path={"/"} element={<Hero/>}/>
-            <Route path={"/test"} element={<Test/>}/>
-            <Route path="/f" element={<ProductFilters onFilterChange={() => {
-            }}/>}/>
-            {/* остальные маршруты */}
+            <Route path="/" element={<Layout />}>
+              <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
+              <Route path="/avatar" element={<Profile/>}/>
+              <Route path="/page" element={<Layers/>}/>
+              <Route path="/products" element={<ProductCards/>}/>
+              <Route path="/checkout" element={<Checkout/>}/>
+              <Route path={"/cart"} element={<ShoppingCart/>}/>
+              <Route path={"/nav"} element={<Navigation/>}/>
+              <Route path={"/requisites"} element={<Requisites/>}/>
+              <Route path={"/login"} element={<Login/>}/>
+              <Route path={"/register"} element={<Register/>}/>
+              <Route path={"/profile"} element={<Profile/>}/>
+              <Route path={"/main"} element={<Hero/>}/>
+              <Route path={"/test"} element={<Test/>}/>
+              <Route path="/f" element={<ProductFilters onFilterChange={() => {
+              }}/>}/>
+              <Route path={"/chat"} element={<ChatWebsocket/>}/>
+            </ Route>
           </Routes>
           <ToastContainer theme="dark"/>
         </div>
