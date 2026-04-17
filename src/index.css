@@ -71,8 +71,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(145deg, rgba(42, 36, 30, 0.56) 0%, #1E1915 50%, #0F0C0A 100%);
-  background-attachment: fixed;
+  background: linear-gradient(145deg, rgb(0, 0, 0) 0%, #101111 50%, #161b1d 100%) fixed;
   overflow-x: hidden;
   position: relative;
 }
