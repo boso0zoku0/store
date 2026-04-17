@@ -1,15 +1,15 @@
 // components/ChatButton/ChatButton.tsx
 import {useState} from 'react';
-
 import styles from './ButtonChat.module.css';
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
-import ChatOperator from "../ChatWindow/Operator.tsx"; // создадим отдельный компонент
+import {useAuth} from "../../../../contexts/AuthContexts.tsx";
+import ChatClient from "../Client.tsx";
+import ChatOperator from "../Operator.tsx";
 
 export default function ChatButton() {
   const {user, isLoading} = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  if (isLoading) return null;
+  if (isLoading || onclose) return null;
   if (!user?.user_role) return null;
   const isOperator = user.user_role === 'assistant'
 
@@ -19,6 +19,7 @@ export default function ChatButton() {
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
+    console.log(`user: ${user.name}`)
   };
 
   return (
@@ -50,7 +51,7 @@ export default function ChatButton() {
       {isChatOpen && (
         isOperator
           ? <ChatOperator operatorName={user.name} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}/>
-          : <ChatClient onClose={() => setIsChatOpen(false)}/>
+          : <ChatClient clientName={user.name} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}/>
       )}
 
     </>

@@ -1,0 +1,56 @@
+.grid {
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 280px 1fr 320px;  /* фикс. ширина сайдбара */
+}
+
+.leftSidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(10, 10, 10, 0.93);
+  border-radius: 12px;
+  padding: 16px;
+  gap: 24px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+
+.header {
+  display: flex;
+  width: 20px;
+}
+.containerContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: red;
+}
+.button {
+  border: 2px solid green;
+  display: flex;
+  flex: 1;
+}
+.a {
+  flex: 1;
+}
+
+
+
+
+.contentImg {
+  width: 100%;
+  height: 100%;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 16px;
+}

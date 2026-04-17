@@ -7,10 +7,10 @@ interface Message {
   message: string;
   username: string;
   timestamp: Date;
-  isOwn: boolean;
+  is_own: boolean;
   type?: string,
-  fileUrl?: string,
-  mimeType?: string,
+  file_url?: string,
+  mime_type?: string,
 }
 
 interface Client {
@@ -25,7 +25,7 @@ interface OperatorPanelProps {
 }
 
 export const OperatorMessageBubble = ({message}: { message: Message }) => {
-  const style = message.isOwn
+  const style = message.is_own
     ? {
       container: 'justify-end',
       bubble: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-br-sm',
@@ -42,36 +42,36 @@ export const OperatorMessageBubble = ({message}: { message: Message }) => {
   return (
     <div className={`flex ${style.container} mb-3`}>
       <div className="flex items-end gap-2 max-w-[70%]">
-        {!message.isOwn && (
+        {!message.is_own && (
           <div className="bg-blue-100 p-2 rounded-full mb-1 flex-shrink-0">
             <User className="w-5 h-5 text-blue-700"/>
           </div>
         )}
 
         <div>
-          {!message.isOwn && (
+          {!message.is_own && (
             <div className="text-xs text-gray-500 mb-1 ml-1">{message.username}</div>
           )}
 
           <div className={`px-4 py-3 rounded-2xl ${style.bubble}`}>
             {/* 🔥 ДОБАВЛЯЕМ ОТОБРАЖЕНИЕ МЕДИА */}
-            {message.fileUrl && (
+            {message.file_url && (
               <div className="mb-2">
-                {message.mimeType?.startsWith('image/') ? (
+                {message.mime_type?.startsWith('image/') ? (
                   <img
-                    src={`http://localhost:8000${message.fileUrl}`}
+                    src={`http://localhost:8000${message.file_url}`}
                     alt="изображение"
                     className="max-w-full rounded-lg max-h-64 object-contain"
                   />
-                ) : message.mimeType?.startsWith('video/') ? (
+                ) : message.mime_type?.startsWith('video/') ? (
                   <video
-                    src={`http://localhost:8000${message.fileUrl}`}
+                    src={`http://localhost:8000${message.file_url}`}
                     controls
                     className="max-w-full rounded-lg max-h-64"
                   />
                 ) : (
                   <a
-                    href={`http://localhost:8000${message.fileUrl}`}
+                    href={`http://localhost:8000${message.file_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white underline"
@@ -95,7 +95,7 @@ export const OperatorMessageBubble = ({message}: { message: Message }) => {
           </div>
         </div>
 
-        {message.isOwn && (
+        {message.is_own && (
           <div className="bg-purple-100 p-2 rounded-full mb-1 flex-shrink-0">
             <UserCircle2 className="w-5 h-5 text-purple-700"/>
           </div>

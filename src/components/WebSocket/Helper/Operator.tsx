@@ -1,15 +1,14 @@
 // Понадобится для события клика по клиенту
-import {chooseClient} from "../utils/OperatorHelper/ChooseClient.tsx";
+import styles from "./ChatWindowOperator.module.css"
 import {handleCancelFile, handleFileSelect, uploadFile} from "../utils/OperatorHelper/fileUploadHandler.tsx";
 
 import {useEffect, useRef, useState} from "react";
-import type {OperatorMessage, Client, OperatorPanelProps, ClientMessage} from "../interfaces.tsx";
+import type {OperatorMessage, Client, OperatorPanelProps} from "../interfaces.tsx";
 import {loadClients} from "../utils/OperatorHelper/loadClients.tsx";
+import {OperatorMessageBubble} from "../utils/operatorMessageBubble.tsx";
 
 
-
-
-export default function ChatOperator({ isOpen, operatorName }: OperatorPanelProps) {
+export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps) {
   const [messages, setMessages] = useState<Record<string, OperatorMessage[]>>({});
   const [inputValue, setInputValue] = useState('')
   const [clients, setClients] = useState<Client[]>([])
@@ -34,8 +33,9 @@ export default function ChatOperator({ isOpen, operatorName }: OperatorPanelProp
 
 
   useEffect(() => {
-    const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/wss/operator/${operatorName}`)
+    const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/operator/${operatorName}`)
     websocket.onopen = () => {
+      console.log(`соединение открыто`)
       setLoad(false)
       setIsConnect(true)
 
@@ -143,7 +143,7 @@ export default function ChatOperator({ isOpen, operatorName }: OperatorPanelProp
     }
     setWs(websocket)
 
-  })
+  }, [selectedClient])
 
   // Отправка сообщения
   const sendMessage = async (e: React.FormEvent) => {
@@ -206,6 +206,136 @@ export default function ChatOperator({ isOpen, operatorName }: OperatorPanelProp
   };
 
   return (
-    <div></div>
-  )
+    <div className={styles.chatContainer}>
+      <div className={styles.header}>
+        <div className={styles.headerInfo}>
+          <h3>Чат оператора</h3>
+          <p>{operatorName} • {isConnect ? 'Подключен' : 'Не подключен'}</p>
+        </div>
+        <button onClick={onclose} className={styles.closeBtn}>
+          ✕
+        </button>
+      </div>
+
+      <div className={styles.clientsList}>
+        {clients.length === 0 ? (
+          <div style={{padding: '20px', textAlign: 'center', color: '#9ca3af'}}>
+            Нет активных клиентов
+          </div>
+        ) : (
+          clients.map((client) => (
+            <button
+              key={client.username}
+              onClick={() => setSelectedClient(client.username)}
+              className={`${styles.clientItem} ${selectedClient === client.username ? styles.clientItemActive : ''}`}
+            >
+              <div className={styles.clientInfo}>
+                <div className={styles.clientAvatar}>
+                  <span>👤</span>
+                  {client.isActive && <div className={styles.onlineDot}/>}
+                </div>
+                <div>
+                  <div className={styles.clientName}>{client.username}</div>
+                  <div className={styles.clientStatus}>
+                    {client.isActive ? 'В сети' : 'Не в сети'}
+                  </div>
+                </div>
+              </div>
+              {client.unreadCount > 0 && (
+                <div className={styles.unreadBadge}>{client.unreadCount}</div>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+
+      <div className={styles.chatArea}>
+        {!selectedClient ? (
+
+          <div className={styles.noClientMessage}>Выберите клиента для начала общения</div>
+        ) : (
+          <>
+            <div className={styles.messagesArea}>
+              <div className={styles.messageList}>
+                {messages[selectedClient]?.map((msg) => (
+                  <OperatorMessageBubble key={msg.id} message={msg}/>
+                ))}
+                <div ref={messagesEndRef}/>
+              </div>
+            </div>
+
+            {selectedFile && filePreview && (
+              <div className={styles.filePreview}>
+                <div className={styles.previewContainer}>
+                  {selectedFile.type.startsWith('image/') ? (
+                    <img src={filePreview} alt="Preview" className={styles.previewImage}/>
+                  ) : (
+                    <div className={styles.previewVideo}>🎬</div>
+                  )}
+                  <div className={styles.previewInfo}>
+                    <div className={styles.previewName}>{selectedFile.name}</div>
+                    <div className={styles.previewSize}>
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleCancelFile({
+                      setSelectedFile,
+                      filePreview,
+                      setFilePreview,
+                      fileInputRef
+                    })}
+                    className={styles.cancelPreviewBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={sendMessage} className={styles.inputForm}>
+              <div className={styles.inputContainer}>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={() => handleFileSelect}
+                  className="hidden"
+                  id="operator-file-input"
+                  style={{display: 'none'}}
+                />
+                <label
+                  htmlFor="operator-file-input"
+                  className={`${styles.fileLabel} ${!selectedClient ? styles.fileLabelDisabled : ''}`}
+                >
+                  📎
+                </label>
+
+                <textarea
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={selectedClient ? 'Введите сообщение...' : 'Выберите клиента'}
+                  className={styles.messageInput}
+                  disabled={!selectedClient}
+                  rows={1}
+                />
+
+                <button
+                  type="submit"
+                  disabled={(!inputValue.trim() && !selectedFile) || !isConnect || !selectedClient || isUploading}
+                  className={styles.sendBtn}
+                >
+                  {isUploading ? (
+                    <div className={styles.spinner}/>
+                  ) : (
+                    <span>✈️</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

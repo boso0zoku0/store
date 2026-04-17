@@ -1,26 +1,31 @@
 // pages/Profile.tsx
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useParams} from 'react-router-dom';
 import {Calendar, Clock, Edit, Heart, LogOut, Mail, MessageCircle, Package, Phone, Settings} from 'lucide-react';
 import styles from './Profile.module.css';
 import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import api from "../../utils/auth.tsx";
 import type {GeneralData} from "./interfaces.tsx";
+import {useAuth} from "../../contexts/AuthContexts.tsx";
 
 
 export default function Profile() {
+  const {user} = useAuth();           // из контекста
+  const {id} = useParams();           // из URL
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'orders' | 'favorites' | 'settings'>('orders');
 
+  const isOwn = user?.url_id === id;
 
   const {data, isLoading} = useQuery<GeneralData>({
     queryKey: ['userProfile'],
     queryFn: async () => {
-      const response = await api.get('/users/get');
+      const response = await api.get(`/users/get/${id}`);
       return response.data
     },
+    enabled: !!id,
     staleTime: 1000 * 60 * 10,
     gcTime: 1000 * 60 * 30,
   });
@@ -71,26 +76,31 @@ export default function Profile() {
                   <Calendar size={16}/>
                   <span>С нами с {formatDate(data?.date_registration)}</span>
                 </div>
-                <div className={styles.stat}>
-                  <Package size={16}/>
-                  <span>{data?.total_orders} заказов</span>
-                </div>
-                <span className={styles.totalSpent}>
+                {isOwn && (
+                  <>
+                    <div className={styles.stat}>
+                      <Package size={16}/>
+                      <span>{data?.total_orders} заказов</span>
+                    </div>
+                    <span className={styles.totalSpent}>
                   {(data?.total_price ?? 0).toLocaleString('de-DE')} ₽
                 </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
-
-          <div className={styles.actions}>
-            <button className={styles.contactBtn} onClick={handleContactArtist}>
-              <MessageCircle size={18}/>
-              <span>Связаться с автором</span>
-            </button>
-            <button className={styles.logoutBtn} onClick={handleLogout}>
-              <LogOut size={18}/>
-            </button>
-          </div>
+          {!isOwn && (
+            <div className={styles.actions}>
+              <button className={styles.contactBtn} onClick={handleContactArtist}>
+                <MessageCircle size={18}/>
+                <span>Написать сообщение</span>
+              </button>
+              <button className={styles.logoutBtn} onClick={handleLogout}>
+                <LogOut size={18}/>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Табы */}

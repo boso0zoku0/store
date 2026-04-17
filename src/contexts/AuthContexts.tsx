@@ -1,6 +1,6 @@
 // contexts/AuthContext.tsx
 import {createContext, useContext, useState, useEffect, ReactNode} from 'react';
-import {
+import api, {
   fetchUserData,
   clearTokens,
   isAuthenticated as checkAuth,
@@ -21,10 +21,9 @@ interface AuthContextType {
   isAuth: boolean
 }
 
-// Создаем контекст
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Провайдер
 export const AuthProvider = ({children}: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -35,13 +34,8 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
     const initAuth = async () => {
       const hasToken = checkAuth();
       if (hasToken) {
-        console.log('🔍 fetching user data...');
         const userData = await fetchUserData();
-        console.log('🔍 userData:', userData);
-
         if (userData) {
-          console.log('🔍 fetching user role...');
-          console.log('🔍 role:', userData.user_role);
           setUser(userData);
           setIsAuthenticated(true);
         } else {
@@ -52,27 +46,23 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
         }
       } else {
       }
-
       setIsLoading(false);
     };
 
     initAuth();
   }, []);
 
-  // Вход
   const login = (userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
   };
 
-  // Выход
   const logout = async () => {
     await apiLogout();  // очищает токены
     setUser(null);
     setIsAuthenticated(false);
   };
 
-  // Обновление данных пользователя (после редактирования профиля)
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       setUser({...user, ...userData});
@@ -92,7 +82,6 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Хук для использования контекста
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

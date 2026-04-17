@@ -46,12 +46,7 @@ export default function ShoppingCart() {
     showToast.success('🎉 Переход к оформлению...');
     navigate('/checkout');
   };
-  const handlePayment = (slug: string, stat: string) => {
-    api.post("/products/change/status",
-      {slug, stat},
-      {withCredentials: true}
-    )
-  }
+
 
   // Подсчёт общей суммы
   const totalAmount = cartItems.reduce((sum, item) => {

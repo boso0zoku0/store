@@ -4,5 +4,7 @@ export interface User {
   email: string;
   phone: string;
   user_role: string;
+  url_id: string;
   date_registration?: string;
+  ip?: string;
 }

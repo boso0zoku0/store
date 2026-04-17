@@ -68,7 +68,7 @@ export default function ProductCards() {
 
   const handleAuth = async (slug: string, product_status: ProductStatus) => {
     try {
-      await api.post(`/products/add/to-cart`, {slug, product_status}, {withCredentials: true});
+      await api.post(`/products/add/to-cart`, {slug, product_status});
       setIsReqLogin(false);
       window.open('/cart');
     } catch (error: any) {
@@ -106,7 +106,6 @@ export default function ProductCards() {
     setImageIndices(prev => {
       const current = prev[productId] ?? 0;  // 👈 значение по умолчанию 0
       const next = (current + 1) % photosLength;
-      console.log(`Вперед: текущий ${current} → новый ${next}`);
       return {...prev, [productId]: next};
     });
   };

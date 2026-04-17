@@ -1,7 +1,5 @@
 export interface ClientMessage {
   id: string;
-  from: string;
-  to: string;
   message: string;
   username: string;
   timestamp: Date;
@@ -16,9 +14,8 @@ export interface ClientMessage {
 
 export interface ClientPanelProps {
   isOpen: boolean;
-  onClose: () => void;
-  ws: WebSocket
-
+  clientName: string;
+  onClose: boolean
 }
 
 

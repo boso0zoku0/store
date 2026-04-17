@@ -1,0 +1,108 @@
+/* page.module.css */
+
+.page {
+  display: grid;
+  grid-template-areas:
+    "header header header"
+    "sidebar main rightbar"
+    "footer footer footer";
+  grid-template-columns: 150px 1fr 150px;
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;
+  min-height: 100vh;
+  max-width: 1900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 1200px) {
+  .page {
+    max-width: 1200px;
+  }
+  
+}
+
+/* Шапка */
+.header {
+  grid-area: header;
+  background: #2b241b;
+  color: #FFE6C7;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid green
+}
+
+/* Левая боковая панель */
+.sidebar {
+  grid-area: sidebar;
+  background: #f5f0e8;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e0d6cc;
+}
+
+/* Основной контент */
+.main {
+  grid-area: main;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e0d6cc;
+  min-height: 500px;
+}
+
+/* Правая боковая панель */
+.rightbar {
+  grid-area: rightbar;
+  background: #f5f0e8;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e0d6cc;
+}
+
+/* Подвал */
+.footer {
+  grid-area: footer;
+  background: #2b241b;
+  color: #FFE6C7;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .page {
+    grid-template-areas:
+      "header"
+      "main"
+      "sidebar"
+      "rightbar"
+      "footer";
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .sidebar, .rightbar {
+    display: none; /* или оставить, если нужны */
+  }
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 480px) {
+  .page {
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}

@@ -1,34 +1,29 @@
 // components/ChatButton/Client.tsx
 import React, {useState, useRef, useEffect} from 'react';
-import styles from './ChatWindow.module.css';
-import type {ClientMessage, ClientPanelProps} from "../interfaces"
+import styles from './ChatWindowClient.module.css';
+import type {ClientMessage, ClientPanelProps} from "../interfaces.tsx"
 import api from "../../../utils/auth.tsx";
+import {uploadFile, handleCancelFile, handleFileSelect} from "../utils/OperatorHelper/fileUploadHandler.tsx";
+import {ClientMessageBubble} from "../utils/clientMessageBubble.tsx";
 
-
-interface ChatWindowProps {
-  onClose: () => void;
-  userRole: string;
-}
-
-export default function Client({onClose, userRole}: ChatWindowProps) {
+export default function ChatClient({isOpen, clientName, onClose}: ClientPanelProps) {
   const [messages, setMessages] = useState<ClientMessage[]>([]);
-  const [inputText, setInputText] = useState('');
   const operator = useRef('');
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-
+  const [inputValue, setInputValue] = useState('')
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Автоскролл к последнему сообщению
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
   }, [messages]);
 
   useEffect(() => {
-    api.get(`/get-user-dialog?username=${operator}`, {withCredentials: true})
+    api.get(`/get-user-dialog?username=${operator}`)
       .then((response) => {
         const messageTransform = response.data.map((data) => ({
           id: data.id,
@@ -61,21 +56,17 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
       setWs(null);
       setIsConnected(false);
       setMessages([]);
-      setIsLoggedIn(false);
-      setUsername('');
-      setHasJoined(false);
     }
   }, [isOpen, ws]);
 
 
-
-  const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/clients/${client}`);
+  useEffect(() => {
+    if (!isOpen) return;
+    const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/clients/${clientName}`);
 
     websocket.onopen = () => {
       console.log('✓ WebSocket подключен');
       setIsConnected(true);
-      setHasJoined(true);
-      setIsLoggedIn(true);
     };
 
     websocket.onmessage = (event) => {
@@ -95,7 +86,6 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
           operator.current = data.from;
           setMessages(prev => [...prev, newMessage]);
         } else if (data.type === "media") {
-          console.log(data.type)
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
@@ -103,18 +93,17 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
             timestamp: new Date(),
             isOwn: false,
             type: 'media',
-            mimeType: data.mime_type,
-            fileUrl: data.file_url
-          }
+            mime_type: data.mime_type,
+            file_url: data.file_url
+          };
           operator.current = data.from;
-          setMessages(prev => [...prev, newMessage])
-
+          setMessages(prev => [...prev, newMessage]);
         } else if (data.type === "greeting") {
           if (Array.isArray(data.message)) {
             data.message.forEach((msg: string, index: number) => {
               setTimeout(() => {
                 const newMessage: ClientMessage = {
-                  id: (Date.now() + index).toString() + Math.random(),
+                  id: Date.now().toString() + Math.random(),
                   message: msg,
                   username: 'Bot',
                   timestamp: new Date(),
@@ -137,7 +126,6 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
             };
             setMessages(prev => [...prev, newMessage]);
           }
-
         } else if (data.type === "bot_message") {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
@@ -149,7 +137,6 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
             isButton: false
           };
           setMessages(prev => [...prev, newMessage]);
-
         } else if (data.type === "advertising" || data.type === "notify") {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
@@ -161,8 +148,7 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
             isButton: false
           };
           setMessages(prev => [...prev, newMessage]);
-
-        } else if (data.type == "notify_connect_to_client") {
+        } else if (data.type === "notify_connect_to_client") {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
@@ -173,9 +159,7 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
             isButton: false
           };
           setMessages(prev => [...prev, newMessage]);
-
-        }
-        else {
+        } else {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message || JSON.stringify(data),
@@ -211,9 +195,17 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
       console.log('WebSocket отключен');
       setIsConnected(false);
     };
-
     setWs(websocket);
-  };
+
+    // ✅ Cleanup функция - закрываем соединение при размонтировании
+    return () => {
+      if (websocket.readyState === WebSocket.OPEN) {
+        websocket.close();
+      }
+      setWs(null);
+      setIsConnected(false);
+    };
+  }, [isOpen, clientName]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,28 +215,24 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
     let mediaType: string | undefined;
 
     if (selectedFile) {
-      const uploadResult = await uploadFile(selectedFile);
+      const uploadResult = await uploadFile({file: selectedFile, setIsUploading});
       if (uploadResult) {
         mediaUrl = uploadResult.url;
         mediaType = uploadResult.type;
       } else {
-        // Если загрузка не удалась, не отправляем сообщение
         return;
       }
     }
-
-    // Проверяем, есть ли текст или медиа
     if (!inputValue.trim() && !mediaUrl) {
       return;
     }
 
     const messageData: any = {
       message: inputValue || '',
-      from: username,
+      from: clientName,
       to: operator.current,
     };
 
-    // Добавляем информацию о медиа, если есть
     if (mediaUrl && mediaType) {
       messageData.file_url = mediaUrl;
       messageData.mime_type = mediaType;
@@ -252,90 +240,153 @@ export default function Client({onClose, userRole}: ChatWindowProps) {
 
     ws.send(JSON.stringify(messageData));
 
-    const newMessage: Message = {
+    const newMessage: ClientMessage = {
       id: Date.now().toString() + Math.random(),
       message: inputValue,
-      username: username,
+      username: clientName,
       timestamp: new Date(),
       isOwn: true,
       type: 'client',
-      fileUrl: mediaUrl,
-      mimeType: mediaType,
+      file_url: mediaUrl,
+      mime_type: mediaType,
     };
-
     setMessages(prev => [...prev, newMessage]);
     setInputValue('');
-    setMsgReply('');
-    handleCancelFile()
-    };
+    handleCancelFile({
+      setSelectedFile: setSelectedFile,
+      filePreview: filePreview,
+      setFilePreview: setFilePreview,
+      fileInputRef: fileInputRef
+    })
+  };
 
 
   return (
-    <div className={styles.chatWindow}>
-      {/* Шапка чата */}
-      <div className={styles.chatHeader}>
+    <div className={styles.chatContainer}>
+      {/* Шапка с именем оператора */}
+      <div className={styles.header}>
         <div className={styles.headerInfo}>
-          <div className={styles.avatar}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"
-                    fill="currentColor"/>
-            </svg>
-          </div>
-          <div>
-            <span className={styles.headerTitle}>Поддержка</span>
-            <span className={styles.headerStatus}>онлайн</span>
-          </div>
+          <h3>Чат с поддержкой</h3>
+          <p>
+            <span className={`${styles.operatorStatus} ${!isConnected ? styles.operatorOffline : ''}`}/>
+            {isConnected ? 'В сети' : 'Нет соединения'}
+          </p>
         </div>
-        <button onClick={onClose} className={styles.closeBtn}>×</button>
-      </div>
-      {/* Область сообщений */}
-      <div className={styles.chatMessages}>
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`${styles.message} ${msg.isOwn ? styles.ownMessage : styles.otherMessage}`}
-          >
-            <div className={styles.messageBubble} key={msg.id}>
-              <p>{msg.username}</p>
-              <p>{msg.message}</p>
-              <span>{msg.timestamp.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}</span>
-            </div>
-          </div>
-        ))}
-        <div className={styles.typingIndicator}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div ref={messagesEndRef}/>
-      </div>
-
-      {/* Поле ввода */}
-      <div className={styles.chatInput}>
-        <textarea
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Введите сообщение..."
-          rows={1}
-        />
-        <button className={styles.sendBtn}>
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <button className={styles.closeBtn} onClick={onClose}>
+          ✕
         </button>
       </div>
+
+      {/* Область сообщений */}
+      <div className={styles.messagesArea}>
+        {messages.length === 0 && isConnected ? (
+          <div className={styles.noConnection}>
+            Напишите свой вопрос, и оператор скоро ответит
+          </div>
+        ) : (
+          <div className={styles.messageList}>
+            {messages.map((msg) => (
+              <ClientMessageBubble
+                key={msg.id}
+                message={msg}
+                onBotMessageClick={(text) => {
+                  if (ws && isConnected) {
+                    ws.send(JSON.stringify({message: text, from: clientName, to: 'operator'}));
+                  }
+                }}
+              />
+            ))}
+            <div ref={messagesEndRef}/>
+          </div>
+        )}
+
+        {!isConnected && (
+          <div className={styles.noConnection}>
+            <span>🔌 Соединение потеряно</span>
+            <button className={styles.reconnectBtn}>
+              Переподключиться
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Превью файла */}
+      {selectedFile && filePreview && (
+        <div className={styles.filePreview}>
+          <div className={styles.previewContainer}>
+            {selectedFile.type.startsWith('image/') ? (
+              <img src={filePreview} alt="Preview" className={styles.previewImage}/>
+            ) : selectedFile.type.startsWith('video/') ? (
+              <div className={styles.previewVideo}>🎬</div>
+            ) : (
+              <div className={styles.previewVideo}>📄</div>
+            )}
+            <div className={styles.previewInfo}>
+              <div className={styles.previewName}>{selectedFile.name}</div>
+              <div className={styles.previewSize}>
+                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+              </div>
+            </div>
+            <button
+              onClick={() => handleCancelFile({
+                setSelectedFile: setSelectedFile,
+                filePreview: filePreview,
+                setFilePreview: setFilePreview,
+                fileInputRef: fileInputRef
+              })}
+              className={styles.cancelPreviewBtn}>
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Форма ввода */}
+      <form onSubmit={sendMessage} className={styles.inputForm}>
+        <div className={styles.inputContainer}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,video/*"
+            onChange={(e) => handleFileSelect({e, setSelectedFile, setFilePreview})}
+            style={{display: 'none'}}
+            id="client-file-input"
+          />
+          <label
+            htmlFor="client-file-input"
+            className={`${styles.fileLabel} ${!isConnected ? styles.fileLabelDisabled : ''}`}
+          >
+            📎
+          </label>
+
+          <textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={isConnected ? 'Введите сообщение...' : 'Ожидание подключения...'}
+            className={styles.messageInput}
+            disabled={!isConnected}
+            rows={1}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(e);
+              }
+            }}
+          />
+
+          <button
+            type="submit"
+            disabled={(!inputValue.trim() && !selectedFile) || !isConnected || isUploading}
+            className={styles.sendBtn}
+          >
+            {isUploading ? (
+              <div className={styles.spinner}/>
+            ) : (
+              <span>✈️</span>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
-  );
+  )
 }

@@ -75,7 +75,7 @@ export const uploadFile = async ({
     setIsUploading(true);
     const formData = new FormData();
     formData.append('file', file);
-    const response = await api.post("/media/upload-file", formData, { withCredentials: true });
+    const response = await api.post("/media/upload-file", formData);
     return {
       url: response.data.file_url,
       type: response.data.mime_type,

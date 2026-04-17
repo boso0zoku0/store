@@ -23,7 +23,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
+src/study/DayOne.tsx
 
 
 .DS_STORE

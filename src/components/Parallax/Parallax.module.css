@@ -713,7 +713,7 @@ header.header {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-bottom: 2px dashed var(--color-surface75);
+  border-bottom: 2px dashed var(--accent);
 }
 
 .layers .section:last-child,

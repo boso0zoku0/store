@@ -1,12 +1,14 @@
 import styles from "./Navbar.module.css"
-import {useAuth} from "../../contexts/AuthContexts.tsx";
+import {Envelope3DIcon} from "../../Icons/IconChat.tsx";
+import WsFriendly from "../WebSocket/Friendly/Users.tsx";
+import {useState} from "react";
 
-export default function Navbar() {
-  const {isAuthenticated, isLoading} = useAuth();
+export default function Navbar({isAuthenticated, isLoading, user}) {
+  const [isOpen, setIsOpen] = useState(false)
+  
   if (isLoading) {
     return <div className="navRight">Загрузка...</div>;
   }
-
 
   return (
     <nav className={styles.menu}>
@@ -17,14 +19,23 @@ export default function Navbar() {
           <li><a href="/requisites">Реквизиты Разработчика</a></li>
         </ul>
         <div className={styles.navRight}>
-          {isAuthenticated ? (<a href="/profile" aria-label="Профиль">
+          {isAuthenticated ? (<a href={`/profile/${user?.url_id}`} aria-label="Профиль">
             Профиль
           </a>) : (
-            <a href="/profile" aria-label="Профиль">Войти</a>
+            <a href="/login" aria-label="Профиль">Войти</a>
           )}
-
+          <button className={styles.iconButton} onClick={() => setIsOpen(!isOpen)}>
+            <Envelope3DIcon
+              size={24}
+              color="#d1c2ac"
+              className={styles.navChat}
+            />
+          </button>
         </div>
       </div>
+      {isOpen && (
+        <WsFriendly isOpen={isOpen} onClose={() => setIsOpen(!isOpen)}/>
+      )}
     </nav>
   )
 }

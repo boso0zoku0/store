@@ -2,7 +2,7 @@ import api from "../../../../utils/auth.tsx";
 
 export const loadClients = async ({setClients}) => {
     try {
-      const response = await api.get(`/wss/get-clients`);
+      const response = await api.get(`/get-clients`);
       const clientsList = await response.data
 
       setClients(

@@ -22,6 +22,7 @@
   --btn-hover-bg: var(--accent-border);
   --btn-shadow: 0 8px 20px rgba(19, 227, 57, 0.81);
 
+
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;

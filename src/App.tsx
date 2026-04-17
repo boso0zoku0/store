@@ -13,12 +13,13 @@ import {ToastContainer} from "react-toastify";
 import Login from "./components/Auth/Login/Login.tsx";
 import Hero from "./components/Main/Main.tsx";
 import ProductFilters from "./components/ProductFulter/Filter.tsx";
-import Test from "./components/Example/Test.tsx";
 import Register from "./components/Auth/Registrations/Registrations.tsx";
-import Navbar from "./components/Navbar/Navbar.tsx";
 import {AuthProvider} from "./contexts/AuthContexts.tsx";
-import ChatWebsocket from "./components/WebSocket/MainWs.tsx";
 import Layout from "./components/Layout.tsx";
+import {LeftSidebar} from "./learn/Learn.tsx";
+
+// import {NotificationManager} from "./components/NotificationManager/Manager.tsx";
+
 
 function App() {
 
@@ -27,9 +28,8 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<Layout/>}>
               <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
-              <Route path="/avatar" element={<Profile/>}/>
               <Route path="/page" element={<Layers/>}/>
               <Route path="/products" element={<ProductCards/>}/>
               <Route path="/checkout" element={<Checkout/>}/>
@@ -38,12 +38,11 @@ function App() {
               <Route path={"/requisites"} element={<Requisites/>}/>
               <Route path={"/login"} element={<Login/>}/>
               <Route path={"/register"} element={<Register/>}/>
-              <Route path={"/profile"} element={<Profile/>}/>
-              <Route path={"/main"} element={<Hero/>}/>
-              <Route path={"/test"} element={<Test/>}/>
+              <Route path={"/profile/:id"} element={<Profile/>}/>
+              <Route path={"/"} element={<Hero/>}/>
+              <Route path={"/l"} element={<LeftSidebar/>}/>
               <Route path="/f" element={<ProductFilters onFilterChange={() => {
               }}/>}/>
-              <Route path={"/chat"} element={<ChatWebsocket/>}/>
             </ Route>
           </Routes>
           <ToastContainer theme="dark"/>
