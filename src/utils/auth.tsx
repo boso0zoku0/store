@@ -34,16 +34,6 @@ export const fetchUserData = async (): Promise<User | null> => {
     return null;
   }
 };
-// export const fetchLocationUser = async (ip:string) => {
-//   try {
-//     await api.post('/weather', {ip}).then((res) => {
-//       return res.data.data
-//     })
-//   }
-//   catch (err) {
-//     return err.status
-//   }
-// }
 
 export const logout = async () => {
   try {
@@ -54,7 +44,6 @@ export const logout = async () => {
     clearTokens();
   }
 };
-
 
 const api = axios.create({
   baseURL: '/api',  // или полный URL

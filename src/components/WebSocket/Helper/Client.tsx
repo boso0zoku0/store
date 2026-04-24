@@ -62,7 +62,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
 
   useEffect(() => {
     if (!isOpen) return;
-    const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/clients/${clientName}`);
+    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/clients/${clientName}`);
 
     websocket.onopen = () => {
       console.log('✓ WebSocket подключен');
@@ -276,7 +276,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           ✕
         </button>
       </div>
-
       {/* Область сообщений */}
       <div className={styles.messagesArea}>
         {messages.length === 0 && isConnected ? (
@@ -299,7 +298,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
             <div ref={messagesEndRef}/>
           </div>
         )}
-
         {!isConnected && (
           <div className={styles.noConnection}>
             <span>🔌 Соединение потеряно</span>
@@ -309,8 +307,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           </div>
         )}
       </div>
-
-      {/* Превью файла */}
       {selectedFile && filePreview && (
         <div className={styles.filePreview}>
           <div className={styles.previewContainer}>
@@ -340,8 +336,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           </div>
         </div>
       )}
-
-      {/* Форма ввода */}
       <form onSubmit={sendMessage} className={styles.inputForm}>
         <div className={styles.inputContainer}>
           <input
@@ -358,7 +352,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           >
             📎
           </label>
-
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -373,7 +366,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
               }
             }}
           />
-
           <button
             type="submit"
             disabled={(!inputValue.trim() && !selectedFile) || !isConnected || isUploading}

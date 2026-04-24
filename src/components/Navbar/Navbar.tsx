@@ -1,7 +1,8 @@
 import styles from "./Navbar.module.css"
 import {Envelope3DIcon} from "../../Icons/IconChat.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
-import {useState} from "react";
+import React, {useState} from "react";
+import {User} from "lucide-react";
 
 export default function Navbar({isAuthenticated, isLoading, user}) {
   const [isOpen, setIsOpen] = useState(false)
@@ -20,7 +21,7 @@ export default function Navbar({isAuthenticated, isLoading, user}) {
         </ul>
         <div className={styles.navRight}>
           {isAuthenticated ? (<a href={`/profile/${user?.url_id}`} aria-label="Профиль">
-            Профиль
+            <User size={23} />
           </a>) : (
             <a href="/login" aria-label="Профиль">Войти</a>
           )}

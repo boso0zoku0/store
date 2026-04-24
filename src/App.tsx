@@ -11,7 +11,7 @@ import ModalPurchase from "./components/ModalPurchase/ModalPurchase.tsx";
 import Checkout from "./components/Checkout/Checkout.tsx";
 import {ToastContainer} from "react-toastify";
 import Login from "./components/Auth/Login/Login.tsx";
-import Hero from "./components/Main/Main.tsx";
+// import Hero from "./components/Main/Main.tsx";
 import ProductFilters from "./components/ProductFulter/Filter.tsx";
 import Register from "./components/Auth/Registrations/Registrations.tsx";
 import {AuthProvider} from "./contexts/AuthContexts.tsx";
@@ -39,7 +39,7 @@ function App() {
               <Route path={"/login"} element={<Login/>}/>
               <Route path={"/register"} element={<Register/>}/>
               <Route path={"/profile/:id"} element={<Profile/>}/>
-              <Route path={"/"} element={<Hero/>}/>
+              {/*<Route path={"/"} element={<Hero/>}/>*/}
               <Route path={"/l"} element={<LeftSidebar/>}/>
               <Route path="/f" element={<ProductFilters onFilterChange={() => {
               }}/>}/>

@@ -1,10 +1,10 @@
 import {useRef, useState} from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import api, {setTokens} from "../../../utils/auth.tsx";
 import styles from './Registrations.module.css';
 import Stars from "../Login/Stars.tsx";
 import {useAuth} from "../../../contexts/AuthContexts.tsx";
-
+import {TelegramLogin} from "./RegistrTelegram.tsx";
 
 
 interface RegisterFormData {
@@ -15,7 +15,7 @@ interface RegisterFormData {
 }
 
 export default function Register() {
-  const { login } = useAuth();
+  const {login} = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterFormData>({
     username: '',
@@ -64,19 +64,18 @@ export default function Register() {
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData(prev => ({...prev, [name]: value}));
     setError('');
   };
 
 
-
   return (
     <div className={styles.container}>
-      <Stars />
-      <div className={`${styles.cloud} ${styles.cloud1}`} />
-      <div className={`${styles.cloud} ${styles.cloud2}`} />
-      <div className={styles.mountains} />
+      <Stars/>
+      <div className={`${styles.cloud} ${styles.cloud1}`}/>
+      <div className={`${styles.cloud} ${styles.cloud2}`}/>
+      <div className={styles.mountains}/>
 
       <div className={styles.card}>
         <h1 className={styles.title}>Регистрация</h1>
@@ -148,6 +147,9 @@ export default function Register() {
           >
             {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
+          <div>
+            <TelegramLogin/>
+          </div>
         </form>
 
         <p className={styles.loginLink}>

@@ -33,7 +33,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
 
 
   useEffect(() => {
-    const websocket = new WebSocket(`wss://bosozoku-shop.cloudpub.ru/operator/${operatorName}`)
+    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/operator/${operatorName}`)
     websocket.onopen = () => {
       console.log(`соединение открыто`)
       setLoad(false)

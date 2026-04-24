@@ -78,7 +78,7 @@ export const FloatingNotificationManager = ({username, productName, urlId}) => {
   useEffect(() => {
     if (!isAuthenticated) {return}
 
-    const websocket = new WebSocket(`wss://api/notify?username=${username}&url_id=${urlId}&product_name=Piala`)
+    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/api/notify?username=${username}&url_id=${urlId}&product_name=Piala`)
     websocket.onopen = () => {
       console.log('Открылся Notify Websocket')
     }

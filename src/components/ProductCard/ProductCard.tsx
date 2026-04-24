@@ -201,7 +201,7 @@ export default function ProductCards() {
                   <p className={styles.productDescription}>{product.description?.type || ''}</p>
                   <div className={styles.productFooter}>
                     <span className={styles.productPrice}>{product.price.toLocaleString('de-DE')} ₽</span>
-                    <button className={styles.productButton}
+                    <button className="btn-buy"
                             onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}>
                       В корзину
                     </button>

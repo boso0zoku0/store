@@ -1,15 +1,14 @@
 /* ========== ОСНОВНОЙ КОНТЕЙНЕР (миниатюрный) ========== */
 .chatContainer {
+  display: flex;
   position: fixed;
+  flex-direction: column;
   bottom: 90px;
   right: 24px;
-  width: 380px;           /* ← Уже, чем у оператора (840px) */
-  height: 560px;          /* ← Ниже, чем у оператора */
+  width: 380px;
+  height: 560px;
   background: white;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
   z-index: 9998;
   animation: slideUp 0.3s ease;
@@ -28,7 +27,7 @@
 
 /* ========== ШАПКА С ИМЕНЕМ ОПЕРАТОРА ========== */
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--text-tertiary);
   color: white;
   padding: 14px 16px;
   display: flex;
@@ -44,12 +43,11 @@
 }
 
 .headerInfo p {
-  font-size: 11px;
-  opacity: 0.8;
-  margin: 0;
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 12px;
+  margin: 0;
 }
 
 .operatorStatus {
@@ -58,13 +56,6 @@
   height: 8px;
   border-radius: 50%;
   background: #22c55e;
-  box-shadow: 0 0 4px #22c55e;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
 }
 
 .operatorOffline {
@@ -73,21 +64,19 @@
 }
 
 .closeBtn {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
   transition: background 0.2s;
 }
 
 .closeBtn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #9f4545;
 }
 
 /* ========== ОБЛАСТЬ СООБЩЕНИЙ ========== */
@@ -95,7 +84,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 16px;
-  background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+  background: var(--background-white);
 }
 
 .messageList {
