@@ -5,6 +5,7 @@ export interface User {
   phone: string;
   user_role: string;
   url_id: string;
+  product_name: string;
   date_registration?: string;
   ip?: string;
 }

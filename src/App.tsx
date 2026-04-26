@@ -17,37 +17,39 @@ import Register from "./components/Auth/Registrations/Registrations.tsx";
 import {AuthProvider} from "./contexts/AuthContexts.tsx";
 import Layout from "./components/Layout.tsx";
 import {LeftSidebar} from "./learn/Learn.tsx";
+import {WebSocketProvider} from "./contexts/SocketContext.tsx";
 
 // import {NotificationManager} from "./components/NotificationManager/Manager.tsx";
 
 
 function App() {
-
   return (
     <AuthProvider>
-      <Router>
-        <div>
-          <Routes>
-            <Route path="/" element={<Layout/>}>
-              <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
-              <Route path="/page" element={<Layers/>}/>
-              <Route path="/products" element={<ProductCards/>}/>
-              <Route path="/checkout" element={<Checkout/>}/>
-              <Route path={"/cart"} element={<ShoppingCart/>}/>
-              <Route path={"/nav"} element={<Navigation/>}/>
-              <Route path={"/requisites"} element={<Requisites/>}/>
-              <Route path={"/login"} element={<Login/>}/>
-              <Route path={"/register"} element={<Register/>}/>
-              <Route path={"/profile/:id"} element={<Profile/>}/>
-              {/*<Route path={"/"} element={<Hero/>}/>*/}
-              <Route path={"/l"} element={<LeftSidebar/>}/>
-              <Route path="/f" element={<ProductFilters onFilterChange={() => {
-              }}/>}/>
-            </ Route>
-          </Routes>
-          <ToastContainer theme="dark"/>
-        </div>
-      </Router>
+      <WebSocketProvider>
+        <Router>
+          <div>
+            <Routes>
+              <Route path="/" element={<Layout/>}>
+                <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
+                <Route path="/page" element={<Layers/>}/>
+                <Route path="/products" element={<ProductCards/>}/>
+                <Route path="/checkout" element={<Checkout/>}/>
+                <Route path={"/cart"} element={<ShoppingCart/>}/>
+                <Route path={"/nav"} element={<Navigation/>}/>
+                <Route path={"/requisites"} element={<Requisites/>}/>
+                <Route path={"/login"} element={<Login/>}/>
+                <Route path={"/register"} element={<Register/>}/>
+                <Route path={"/profile/:id"} element={<Profile/>}/>
+                {/*<Route path={"/"} element={<Hero/>}/>*/}
+                <Route path={"/l"} element={<LeftSidebar/>}/>
+                <Route path="/f" element={<ProductFilters onFilterChange={() => {
+                }}/>}/>
+              </ Route>
+            </Routes>
+            <ToastContainer theme="dark"/>
+          </div>
+        </Router>
+      </WebSocketProvider>
     </AuthProvider>
   )
 }

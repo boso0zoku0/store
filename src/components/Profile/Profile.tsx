@@ -9,13 +9,15 @@ import {ru} from 'date-fns/locale';
 import api from "../../utils/auth.tsx";
 import type {GeneralData} from "./interfaces.tsx";
 import {useAuth} from "../../contexts/AuthContexts.tsx";
+import WsFriendly from "../WebSocket/Friendly/Users.tsx";
 
 
 export default function Profile() {
   const {user} = useAuth();           // из контекста
-  const {id} = useParams();           // из URL
+  const {id} = useParams();           // url(не обязательно наш)
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'orders' | 'favorites' | 'settings'>('orders');
+  const [isOpenChat, setIsOpenChat] = useState(false)
 
   const isOwn = user?.url_id === id;
 
@@ -41,8 +43,20 @@ export default function Profile() {
     navigate('/');
   };
 
-  const handleContactArtist = () => {
-    console.log('Связаться с автором');
+  const handleConnect = async (url_id) => {
+    try {
+      const resp = await api.get(`/user/by?url_id=${url_id}`)
+      console.log(`RESP: ${resp.data.data}`)
+      to_user_ref.current = resp.data.username
+    } catch (err) {
+      console.log(`error friendly ws: ${err}`)
+    }
+    setIsOpenChat(!isOpenChat)
+
+  };
+
+  const handleOpenChat = async (url_id: string) => {
+    await handleConnect(url_id);
   };
 
   if (isLoading) {
@@ -91,8 +105,8 @@ export default function Profile() {
             </div>
           </div>
           {!isOwn && (
-            <div className={styles.actions}>
-              <button className={styles.contactBtn} onClick={handleContactArtist}>
+            <div className={styles.actions} onClick={()=>handleOpenChat(id)}>
+              <button className={styles.contactBtn} onClick={handleConnect}>
                 <MessageCircle size={18}/>
                 <span>Написать сообщение</span>
               </button>
@@ -212,6 +226,9 @@ export default function Profile() {
           )}
         </div>
       </div>
+      {isOpenChat && (
+        <WsFriendly isOpen={isOpenChat} onClose={() => setIsOpenChat(!isOpenChat)} to_user={id ? id : ""}/>
+      )}
     </div>
   );
 }

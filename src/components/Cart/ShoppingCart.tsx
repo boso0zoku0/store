@@ -5,6 +5,7 @@ import {showToast} from "../ToastCheckout/Toast.tsx";
 import type {CartItem} from "./interfaces.tsx";
 import api, {isAuthenticated} from "../../utils/auth.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
+import {useAuth} from "../../contexts/AuthContexts.tsx";
 
 
 export default function ShoppingCart() {
@@ -13,6 +14,7 @@ export default function ShoppingCart() {
   const [error, setError] = useState<string | null>(null);
   const [login, setLogin] = useState(false)
   const navigate = useNavigate();
+  const {user, setPurchaseData} = useAuth()
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -44,6 +46,7 @@ export default function ShoppingCart() {
 
   const handleRedirect = () => {
     showToast.success('🎉 Переход к оформлению...');
+    cartItems.map((product) => setPurchaseData(user?.name, user?.url_id, product.Products.shortName))
     navigate('/checkout');
   };
 
@@ -163,7 +166,6 @@ export default function ShoppingCart() {
               {totalAmount.toLocaleString('de-DE')} ₽
             </span>
           </div>
-
           <div className={styles.container}>
             <button
               className="btn"

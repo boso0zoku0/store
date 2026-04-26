@@ -1,11 +1,16 @@
 import {useEffect, useState, useRef, useCallback} from 'react';
 import {useAuth} from "../../../contexts/AuthContexts.tsx";
 import styles from "./WebSocketFriendly.module.css"
+import axios from "axios";
+import api from "../../../utils/auth.tsx";
 
 interface Message {
   id: string;
-  message: string;
   username: string;
+  room_id: string;
+  from_user: string;
+  to_user: string;
+  message: string;
   timestamp: Date;
   isOwn: boolean;
   isButton?: boolean;
@@ -16,18 +21,21 @@ interface Message {
   mimeType?: string
 }
 
+
 interface ClientPanelProps {
   isOpen: boolean;
-  onClose: () => void
+  onClose: () => void;
+  to_user?: string;
 }
 
-export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
+export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps) {
   const {user} = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);  // ← храним ссылку на сокет
+  const to_user_ref = useRef('')
 
   // Прокрутка к последнему сообщению
   const scrollToBottom = useCallback(() => {
@@ -46,7 +54,7 @@ export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
 
     // Создаем соединение
     const socket = new WebSocket(
-      `wss://bosozoku-shop.cloudpub.ru/users/dialog/${user.url_id}`
+      `wss://store-backend.cloudpub.ru/friendly/dialog?url_id=${user.url_id}`
     );
 
     socket.onopen = () => {
@@ -59,11 +67,14 @@ export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
         const data = JSON.parse(event.data);
         console.log('Получено сообщение:', data);
 
-        if (data.type === "user_message") {
+        if (data.type === "friendly_message") {
           const newMessage: Message = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
             username: data.from || 'Собеседник',
+            room_id: data["room_id"],
+            from_user: data["from_user"],
+            to_user: data["to_user"],
             timestamp: data.timestamp || Date.now(),
             isOwn: false,
             type: data.type
@@ -95,7 +106,8 @@ export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
       wsRef.current = null;
       setIsConnected(false);
     };
-  }, [isOpen, user?.url_id]);  // ← зависимости: открыта модалка и id пользователя
+  }, [isOpen, user?.url_id]);
+
 
   // Отправка сообщения
   const sendMessage = useCallback(() => {
@@ -104,11 +116,11 @@ export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
       console.warn('WebSocket не подключен');
       return;
     }
-
     const messageToSend = {
-      type: 'user_message',
       message: inputMessage,
-      timestamp: Date.now(),
+      from_user: user?.name,
+      to_user: to_user,
+      url_id: user?.url_id
     };
 
     wsRef.current.send(JSON.stringify(messageToSend));
@@ -141,7 +153,7 @@ export default function WsFriendly({isOpen, onClose}: ClientPanelProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <span>
-          Chat Message
+          Chat Message with {to_user_ref.current}
           {isConnected && <span className={styles.statusOnline}> ● Онлайн</span>}
         </span>
         <button className={styles.closeBtn} onClick={onClose}>✕</button>

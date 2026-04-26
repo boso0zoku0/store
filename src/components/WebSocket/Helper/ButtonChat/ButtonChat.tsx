@@ -19,7 +19,6 @@ export default function ChatButton() {
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
-    console.log(`user: ${user.name}`)
   };
 
   return (
@@ -47,7 +46,6 @@ export default function ChatButton() {
           <circle cx="16" cy="10" r="1.5" fill="white"/>
         </svg>
       </button>
-
       {isChatOpen && (
         isOperator
           ? <ChatOperator operatorName={user.name} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}/>

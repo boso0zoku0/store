@@ -1,26 +1,22 @@
 // FloatingNotification.tsx
 import {motion, AnimatePresence} from 'motion/react';
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../../contexts/AuthContexts.tsx";
+import {useWebSocket} from "../../../contexts/SocketContext.tsx";
 
 interface FloatingNotificationProps {
-  userName: string;
-  productName: string;
-  userId: string;
-  onClose: () => void;
-}
-interface Data {
-  userName: string;
-  productName: string;
-  userId: string
+  username: string;
+  product_name: string;
+  url_id: string;
+  onClose?: () => void;
 }
 
-const FloatingNotification = ({userName, productName, onClose}: FloatingNotificationProps) => {
+// Плавающая нотификация
+const FloatingNotification = ({username, url_id, product_name, onClose}: FloatingNotificationProps) => {
   // Случайное смещение по X (влево/вправо)
   const randomX = (Math.random() - 0.5) * 100; // -50px до 50px
   const randomRotate = (Math.random() - 0.5) * 30; // -15deg до 15deg
-
   return (
     <motion.div
       layout
@@ -66,33 +62,26 @@ const FloatingNotification = ({userName, productName, onClose}: FloatingNotifica
       }}
     >
       <span style={{marginRight: '8px', fontSize: '16px'}}>🎈</span>
-      {userName} купил(а) {productName}!
+      {username} купил(а) {product_name} с адресом {url_id}!
     </motion.div>
   );
 };
-
-export const FloatingNotificationManager = ({username, productName, urlId}) => {
+// Плавающий менеджер уведомлений
+export const FloatingNotificationManager = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([]);
-  const { user, isAuthenticated } = useAuth();
+  const [notifications, setNotifications] = useState<Array<Record<string, string>>>([]);
+  const {user, isAuthenticated} = useAuth();
+  const {message, sendMessage} = useWebSocket()
   useEffect(() => {
-    if (!isAuthenticated) {return}
+    if (message) {
+      addNotification(message)
+    }
+  }, [message]);
 
-    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/api/notify?username=${username}&url_id=${urlId}&product_name=Piala`)
-    websocket.onopen = () => {
-      console.log('Открылся Notify Websocket')
-    }
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      console.log('Уведомление новое пришло')
-      addNotification(data)
-    }
-  }, [user]);
 
   const addNotification = (notification: Record<string, string>) => {
     const id = Date.now() + Math.random();
     setNotifications(prev => [...prev, {id, ...notification}]);
-
     // Удаляем через 3 секунды (анимация длится 2.5с)
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
@@ -104,9 +93,10 @@ export const FloatingNotificationManager = ({username, productName, urlId}) => {
       <AnimatePresence mode="popLayout">
         {notifications.map((notif, idx) => (
           <FloatingNotification
-            userName={username}
-            productName={productName}
-            onClose={() => navigate(`/profile/${notif.urlId}`)}
+            username={notif.username}
+            url_id={notif.url_id}
+            product_name={notif.product_name}
+            onClose={() => navigate(`/profile/${notif.url_id}`)}
           />
         ))}
       </AnimatePresence>

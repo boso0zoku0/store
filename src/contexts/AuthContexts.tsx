@@ -18,7 +18,8 @@ interface AuthContextType {
   logout: () => Promise<void>;    // выход
   updateUser: (userData: Partial<User>) => void;  // обновление данных
   user_role: string;
-  isAuth: boolean
+  isAuth: boolean;
+  setPurchaseData: (username: string, product_id: string, url_id: string)=>void;
 }
 
 
@@ -68,6 +69,16 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
       setUser({...user, ...userData});
     }
   };
+  const setPurchaseData = (username: string, url_id: string, product_name: string) => {
+    setUser(prevState => {
+      return {
+        ...prevState,
+        name: username,
+        product_name: product_name,
+        url_id: url_id
+      }
+    })
+  }
 
   const value = {
     isAuthenticated,
@@ -76,7 +87,7 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
     login,
     logout,
     updateUser,
-
+    setPurchaseData
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
