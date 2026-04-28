@@ -3,7 +3,7 @@ import {motion, AnimatePresence} from 'motion/react';
 import {useState, useEffect, useRef} from 'react';
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../../../contexts/AuthContexts.tsx";
-import {useWebSocket} from "../../../contexts/SocketContext.tsx";
+import {useWsNotify} from "../../../contexts/SocketNotifyManager.tsx";
 
 interface FloatingNotificationProps {
   username: string;
@@ -71,7 +71,7 @@ export const FloatingNotificationManager = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Array<Record<string, string>>>([]);
   const {user, isAuthenticated} = useAuth();
-  const {message, sendMessage} = useWebSocket()
+  const {message, sendMessage} = useWsNotify()
   useEffect(() => {
     if (message) {
       addNotification(message)

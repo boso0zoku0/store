@@ -15,7 +15,7 @@ interface Message {
 }
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
+export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
   const { user, isAuthenticated } = useAuth();
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -68,7 +68,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         websocket.close();
       }
     };
-  }, [isAuthenticated, user?.url_id]); // ← только эти зависимости
+  }, [isAuthenticated, user?.url_id]);
 
   const sendMessage = (data: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -86,7 +86,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useWebSocket = () => {
+export const useWsNotify = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
     throw new Error('useWebSocket must be used within WebSocketProvider');

@@ -1,5 +1,5 @@
 // pages/Profile.tsx
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {useNavigate, useParams} from 'react-router-dom';
 import {Calendar, Clock, Edit, Heart, LogOut, Mail, MessageCircle, Package, Phone, Settings} from 'lucide-react';
@@ -10,7 +10,6 @@ import api from "../../utils/auth.tsx";
 import type {GeneralData} from "./interfaces.tsx";
 import {useAuth} from "../../contexts/AuthContexts.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
-
 
 export default function Profile() {
   const {user} = useAuth();           // из контекста
@@ -43,11 +42,15 @@ export default function Profile() {
     navigate('/');
   };
 
-  const handleConnect = async (url_id) => {
+  const handleConnect = async (data: any) => {
     try {
-      const resp = await api.get(`/user/by?url_id=${url_id}`)
-      console.log(`RESP: ${resp.data.data}`)
-      to_user_ref.current = resp.data.username
+      sendMessage({
+        from_user: user?.url_id,
+        sender: user?.name,
+        to_user: data.to_user,
+        recipient: data.recipient,
+        message: data.message
+      })
     } catch (err) {
       console.log(`error friendly ws: ${err}`)
     }
@@ -55,8 +58,8 @@ export default function Profile() {
 
   };
 
-  const handleOpenChat = async (url_id: string) => {
-    await handleConnect(url_id);
+  const handleOpenChat = async () => {
+    await handleConnect({'':''});
   };
 
   if (isLoading) {
