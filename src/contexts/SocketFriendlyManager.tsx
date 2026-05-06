@@ -4,7 +4,6 @@ import {useAuth} from "./AuthContexts.tsx";
 
 interface Message {
   id: string;
-  username: string;
   from_user: string;
   sender: string;
   message: string;
@@ -41,13 +40,12 @@ export default function WSFriendlyProvider({children}) {
     websocket.onmessage = (event) => {
       const data = JSON.parse(event.data)
       const newMessage = {
-        username: data.username,
-        from_user: data.from_user,
         sender: data.sender,
-        to_user: data.to_user,
         recipient: data.recipient,
         message: data.message,
         isOwn: false,
+        timestamp: new Date(),
+
       }
       setMessages(prevState => [...prevState, newMessage])
     }

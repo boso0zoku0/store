@@ -24,6 +24,7 @@ export default function Profile() {
     queryKey: ['userProfile'],
     queryFn: async () => {
       const response = await api.get(`/users/get/${id}`);
+      console.log(`USERS_ID - ${response.data}`)
       return response.data
     },
     enabled: !!id,
@@ -42,24 +43,8 @@ export default function Profile() {
     navigate('/');
   };
 
-  const handleConnect = async (data: any) => {
-    try {
-      sendMessage({
-        from_user: user?.url_id,
-        sender: user?.name,
-        to_user: data.to_user,
-        recipient: data.recipient,
-        message: data.message
-      })
-    } catch (err) {
-      console.log(`error friendly ws: ${err}`)
-    }
-    setIsOpenChat(!isOpenChat)
-
-  };
-
-  const handleOpenChat = async () => {
-    await handleConnect({'':''});
+  const handleOpenChat = () => {
+     setIsOpenChat(!isOpenChat)
   };
 
   if (isLoading) {
@@ -108,8 +93,8 @@ export default function Profile() {
             </div>
           </div>
           {!isOwn && (
-            <div className={styles.actions} onClick={()=>handleOpenChat(id)}>
-              <button className={styles.contactBtn} onClick={handleConnect}>
+            <div className={styles.actions} onClick={handleOpenChat}>
+              <button className={styles.contactBtn}>
                 <MessageCircle size={18}/>
                 <span>Написать сообщение</span>
               </button>
@@ -229,8 +214,8 @@ export default function Profile() {
           )}
         </div>
       </div>
-      {isOpenChat && (
-        <WsFriendly isOpen={isOpenChat} onClose={() => setIsOpenChat(!isOpenChat)} to_user={id ? id : ""}/>
+      {isOpenChat && id &&(
+        <WsFriendly isOpen={isOpenChat} onClose={() => setIsOpenChat(false)} to_user={id}/>
       )}
     </div>
   );
