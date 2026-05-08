@@ -8,24 +8,21 @@
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  background-color: honeydew;
+  background-color: #7e8fb0;  /* базовый цвет */
   border-radius: 16px;
   overflow: hidden;
   z-index: 1000;
 }
 
-/* Шапка — фиксированная */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 2px solid green;
-  background-color: rgba(0, 128, 0, 0.05);
+  border-bottom: 3px solid #ffffff;
+  background-color: var(--background-dark);
   flex-shrink: 0;
 }
-
-/* Заголовок */
 .header span {
   font-weight: 600;
   font-size: 1rem;
@@ -41,7 +38,6 @@
   gap: 8px;
 }
 
-/* Отдельное сообщение */
 .message {
   padding: 8px 12px;
   background: white;
@@ -49,7 +45,6 @@
   border: 1px solid #e0e0e0;
 }
 
-/* Область ввода — фиксированная */
 .inputArea {
   flex-shrink: 0;
   display: flex;
@@ -67,10 +62,6 @@
   outline: none;
 }
 
-.inputArea input:focus {
-  border-color: green;
-}
-
 .inputArea button {
   padding: 8px 16px;
   background: #2b241b;
@@ -84,6 +75,65 @@
 .inputArea button:hover {
   background: #4a3a2e;
 }
+
+.containerGroupDialogs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-sizing: border-box;
+}
+.dialog {
+  display: flex;
+  position: relative;
+  border-radius: 1.25rem;
+  font-weight: 500;
+  color: #333333;
+  font-family: Arial, sans-serif;
+  padding: 0.75rem 1rem;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+  background: rgba(255, 249, 249, 0.63);
+  animation: shimmer 2s infinite linear;
+  cursor: pointer;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+
+.user {
+  position: absolute;
+  top: -1.25rem;
+  background-color: rgba(36, 36, 36, 0.59);
+  color: rgb(216, 220, 203);
+  padding: 0.25rem 0.75rem;  /* 4px 12px в rem */
+  border-radius: 0.5rem;      /* 8px */
+  font-size: 0.9rem;          /* относительный размер */
+}
+.checkDialog {
+  position: absolute;
+  top: -1.25rem;
+  left: 0.25rem;
+  padding: -0.25rem 0.75rem;
+}
+.msg {
+  color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  flex: 1;
+}
+
 
 /* Кнопка закрытия */
 .closeBtn {
@@ -100,4 +150,23 @@
 .closeBtn:hover {
   background-color: rgba(0, 0, 0, 0.05);
   color: #333;
+}
+
+
+
+
+@media (max-width: 768px) {
+  .containerGroupDialogs {
+    padding: 0.75rem;
+  }
+  .dialog {
+    padding: 0.5rem 0.75rem;
+  }
+  .user {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+  }
+  .msg {
+    font-size: 0.75rem;
+  }
 }

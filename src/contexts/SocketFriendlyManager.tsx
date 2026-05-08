@@ -1,9 +1,9 @@
 import {createContext, useContext, useEffect, useRef, useState} from "react";
 import {useParams} from "react-router-dom";
 import {useAuth} from "./AuthContexts.tsx";
+import api from "../utils/auth.tsx";
 
 interface Message {
-  id: string;
   from_user: string;
   sender: string;
   message: string;
@@ -18,8 +18,20 @@ interface Message {
 interface TypeContext {
   wsRef: React.MutableRefObject<WebSocket | null>;
   sendMessage: (data: any) => void;
+  setDialogs: (data:any) => void;
   messages: Message[];
+  dialogs: Dialogs[];
   isConnected: boolean;
+}
+export interface Dialogs {
+  id: string;
+  sender: string;
+  recipient: string;
+  from_user_url_id: string;
+  to_user_url_id: string;
+  message: string;
+  is_own: boolean;
+  is_read_message: boolean
 }
 
 const WsFriendlyContext = createContext<TypeContext | null>(null)
@@ -28,11 +40,16 @@ export default function WSFriendlyProvider({children}) {
   const {url_id} = useParams()
   const [isConnected, setIsConnected] = useState(false)
   const [messages, setMessages] = useState<Message[] | null>([])
+  const [dialogs, setDialogs] = useState<Dialogs[]>([])
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user?.url_id) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) {return;}
+    const getDialogs = async () => {
+      await api.get(`/get-dialogs?url_id=${user.url_id}`).then((res) => setDialogs(res.data))
+    }
+    getDialogs()
     const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/friendly/dialog?url_id=${user.url_id}`)
     websocket.onopen = () => {
       setIsConnected(true)
@@ -43,7 +60,6 @@ export default function WSFriendlyProvider({children}) {
         sender: data.sender,
         recipient: data.recipient,
         message: data.message,
-        isOwn: false,
         timestamp: new Date(),
 
       }
@@ -70,7 +86,7 @@ export default function WSFriendlyProvider({children}) {
   };
 
   return (
-    <WsFriendlyContext.Provider value={{wsRef, sendMessage, messages, isConnected}}>
+    <WsFriendlyContext.Provider value={{wsRef, sendMessage, messages, setDialogs, dialogs, isConnected}}>
       {children}
     </WsFriendlyContext.Provider>
   );

@@ -11,7 +11,7 @@
 
   --accent-border: rgba(0, 0, 0, 0.5);
   --general-background: #111111;
-  /*Вверху стили из прошлого проекта*/
+  --transparent-bg: rgba(36, 36, 36, 0.29);
 
 
   --btn-hover-base: rgba(138, 154, 159, 0.49);
