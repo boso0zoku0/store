@@ -33,12 +33,6 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
     console.log(`mess: ${messages}`)
   }, []);
-  useEffect(() => {
-    if (to_user) {
-      setActiveDialog(to_user);
-      getDialog(user?.url_id, to_user);
-    }
-  }, [to_user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -46,19 +40,26 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN || to_user === undefined) {
-      return;
+    if (to_user) {
+      setActiveDialog(to_user);
     }
+  }, [to_user]);
+
+  useEffect(() => {
+    if (!activeDialog) return;
+    if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+
     const fetchRecipientInfo = async () => {
       try {
-        const resp = await api.get(`/user/by?url_id=${to_user}`);
-        setToUserData(resp.data)
+        const resp = await api.get(`/user/by?url_id=${activeDialog}`);
+        setToUserData(resp.data);
       } catch (error) {
         console.error('Ошибка получения пользователя:', error);
       }
     };
+
     fetchRecipientInfo();
-  }, [isOpen, to_user]);
+  }, [activeDialog]);
 
   const sendMsg = async () => {
     try {
@@ -70,6 +71,7 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
         recipient: toUserData?.username,
         message: inputMessage,
       })
+      setInputMessage('')
     } catch (err) {
       console.log(`error friendly ws: ${err}`)
     }
@@ -92,14 +94,15 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     }
   };
   const openDialog = (dialog: Dialog) => {
-    setActiveDialog(dialog.from_url_id === user?.url_id
+    const interlocutorId = dialog.from_url_id === user?.url_id
       ? dialog.to_url_id
-      : dialog.from_url_id
-    )
+      : dialog.from_url_id;
+
     getDialog(
       user?.url_id,
-      activeDialog
+      interlocutorId
     );
+    setActiveDialog(interlocutorId)
   };
 
   if (!isOpen) {
@@ -115,22 +118,24 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
       </div>
 
-      {activeDialog && <Messages to_user={activeDialog} messages={messages} messagesEndRef={messagesEndRef}/>}
-
-      {toUserData && (
-        <div className={styles.inputArea}>
-          <input
-            type="text"
-            placeholder="Введите сообщение..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            disabled={!isConnected}
-          />
-          <button onClick={sendMsg} disabled={!isConnected}>
-            Отправить
-          </button>
-        </div>
-      )}
+      {activeDialog ? (
+        <>
+          <Messages to_user={activeDialog} messages={messages} messagesEndRef={messagesEndRef}/>
+          <div className={styles.inputArea}>
+            <input
+              type="text"
+              placeholder="Введите сообщение..."
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              disabled={!isConnected}
+            />
+            <button onClick={sendMsg} disabled={!isConnected}>
+              Отправить
+            </button>
+          </div>
+        </>
+      )} : (<div></div>)
+      {/*Доработать условие. или activeDialog или мэпим диалоги(убрать <> и добавить новый стиль внутрь поместить messages и input потому что <> не корректно длля условий*/}
 
       {/*интерфейс для списка диалогов*/}
       {!to_user && (

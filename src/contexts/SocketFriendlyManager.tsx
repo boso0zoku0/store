@@ -66,34 +66,20 @@ export default function WSFriendlyProvider({children}) {
         setMessages(prev => [...prev, msg]);
 
       } else if (data.type === 'response_dialogs_history') {
-        const normalizedDialogs = data.message.map((dialog: any) => ({
-          id: dialog.id,
-          from_url_id: dialog.from_user_url_id,  // ← преобразуем
-          to_url_id: dialog.to_user_url_id,      // ← преобразуем
-          sender: dialog.sender,
-          recipient: dialog.recipient,
-          message: dialog.message,
-          is_own: dialog.is_own,
-          is_read_message: dialog.is_read_message,
-        }));
-        setDialogs(normalizedDialogs);
+        setDialogs(data.message)
 
       } else if (data.type === 'response_dialog_history') {
-        console.log('Тип data.message:', typeof data.message);
-        console.log('data.message:', data.message);
-        console.log('Это массив?', Array.isArray(data.message));
-        const historyDialog = data.message.map((msg) => ({
-          id: msg.id,
-          from_url_id: msg.from_url_id,
-          to_user_url_id: msg.to_user_url_id,
-          recipient: msg.recipient,
-          sender: msg.sender,
-          message: msg.message,
-          is_own: msg.is_own,
-          interlocutor: msg.interlocutor,
-          is_read_message: msg.is_read_message,
-        }))
-        setMessages(historyDialog)
+          const historyDialog = data.message.map((msg) => ({
+            id: msg.id,
+            from_url_id: msg.from_url_id,
+            to_url_id: msg.to_url_id,
+            recipient: msg.recipient,
+            sender: msg.sender,
+            message: msg.message,
+            is_own: msg.is_own,
+            is_read_message: msg.is_read_message,
+          }))
+          setMessages(historyDialog)
       }
     }
     websocket.onerror = (error) => {

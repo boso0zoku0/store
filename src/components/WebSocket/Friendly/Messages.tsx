@@ -13,7 +13,7 @@ export default function Messages({to_user, messages, messagesEndRef}: MessagesPr
     return null
   }
   useEffect(() => {
-    console.log(`messages: ${to_user}`)
+    console.log(`messages: ${messages}`)
   }, []);
   return (
     <div className={styles.messages}>
