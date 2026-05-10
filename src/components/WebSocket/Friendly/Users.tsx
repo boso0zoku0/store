@@ -4,7 +4,8 @@ import styles from "./WebSocketFriendly.module.css"
 import api from "../../../utils/auth.tsx";
 import {useWsFriendly} from "../../../contexts/SocketFriendlyManager.tsx";
 import {data, useNavigate} from "react-router-dom";
-import type {Dialogs} from '../../../contexts/SocketFriendlyManager'
+import type {Dialog} from '../../../contexts/SocketFriendlyManager'
+import Messages from "./Messages.tsx";
 
 interface ClientPanelProps {
   isOpen: boolean;
@@ -22,21 +23,28 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
   const {user} = useAuth();
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const {wsRef, sendMessage, messages, dialogs, setDialogs, isConnected} = useWsFriendly()
+  const {wsRef, sendMessage, messages, dialogs, setDialogs, getDialog, isConnected} = useWsFriendly()
   const [toUserData, setToUserData] = useState<ToUserData | null>(null);
   const navigate = useNavigate()
-  const [isOpenDialog, setIsOpenDialog] = useState(false)
+  const [activeDialog, setActiveDialog] = useState('')
 
-  // Прокрутка к последнему сообщению
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+    console.log(`mess: ${messages}`)
   }, []);
+  useEffect(() => {
+    if (to_user) {
+      setActiveDialog(to_user);
+      getDialog(user?.url_id, to_user);
+    }
+  }, [to_user]);
 
   useEffect(() => {
     scrollToBottom();
+    console.log(`to_user: ${to_user}`)
   }, [messages, scrollToBottom]);
 
-  // Подключение к WebSocket — только когда модалка открыта и есть user
   useEffect(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN || to_user === undefined) {
       return;
@@ -50,13 +58,14 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
       }
     };
     fetchRecipientInfo();
-  }, [isOpen, user?.url_id, to_user]);
+  }, [isOpen, to_user]);
 
   const sendMsg = async () => {
     try {
       sendMessage({
-        from_user_url_id: user?.url_id,
-        to_user_url_id: toUserData?.url_id,
+        from_url_id: user?.url_id,
+        to_url_id: toUserData?.url_id,
+        type: 'client_msg',
         sender: user?.name,
         recipient: toUserData?.username,
         message: inputMessage,
@@ -65,13 +74,13 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
       console.log(`error friendly ws: ${err}`)
     }
   };
-  const markMessage = async (dialog: Dialogs) => {
+  const markMessage = async (dialog: Dialog) => {
     if (!dialog.is_read_message) {
       const updatedDialogs = dialogs.map(d =>
         d.id === dialog.id ? {...d, is_read_message: true} : d
       );
       setDialogs(updatedDialogs);
-      await api.get(`/mark-message?current_url_id=${user?.url_id}&interlocutor_url_id=${dialog.from_user_url_id}`);
+      await api.get(`/mark-message?current_url_id=${user?.url_id}&interlocutor_url_id=${dialog.from_url_id}`);
     }
   };
 
@@ -81,6 +90,16 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     if (e.key === 'Enter') {
       await sendMsg();
     }
+  };
+  const openDialog = (dialog: Dialog) => {
+    setActiveDialog(dialog.from_url_id === user?.url_id
+      ? dialog.to_url_id
+      : dialog.from_url_id
+    )
+    getDialog(
+      user?.url_id,
+      activeDialog
+    );
   };
 
   if (!isOpen) {
@@ -95,23 +114,8 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
         </span>
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
       </div>
-      {isOpenDialog &&
-        <div className={styles.messages}>
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`${styles.message} ${msg.isOwn ? styles.ownMessage : styles.otherMessage}`}
-            >
-              <span className={styles.messageUsername}>{msg.sender}</span>
-              <span className={styles.messageText}>{msg.message}</span>
-              <span className={styles.messageTime}>
-              {new Date(msg.timestamp).toLocaleTimeString()}
-            </span>
-            </div>
-          ))}
-          <div ref={messagesEndRef}/>
-        </div>
-      }
+
+      {activeDialog && <Messages to_user={activeDialog} messages={messages} messagesEndRef={messagesEndRef}/>}
 
       {toUserData && (
         <div className={styles.inputArea}>
@@ -120,7 +124,6 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
             placeholder="Введите сообщение..."
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
             disabled={!isConnected}
           />
           <button onClick={sendMsg} disabled={!isConnected}>
@@ -128,19 +131,21 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
           </button>
         </div>
       )}
+
       {/*интерфейс для списка диалогов*/}
       {!to_user && (
         <>
           {dialogs.map((dialog) => (
             <div key={dialog.id} className={styles.containerGroupDialogs}
-              //*По клику вызываю компонент отображения сообщений диалога, и сообщение помечаю прочитанным уже в нем*/
                  onClick={async () => {
                    if (!dialog.is_own && !dialog.is_read_message) (
                      await markMessage(dialog)
                    )
                  }}>
-              <div className={styles.dialog}>
-                <div className={styles.user} onClick={() => navigate(`/profile/${dialog?.from_user_url_id}`)}>
+              <div
+                className={styles.dialog}
+                onClick={() => openDialog(dialog)}>
+                <div className={styles.user} onClick={() => navigate(`/profile/${dialog?.from_url_id}`)}>
                   {!dialog.is_own ? dialog.sender : 'Вы'}
                 </div>
                 <div className={styles.msg}>
@@ -158,4 +163,6 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
       )}
     </div>
   );
+
+
 }
