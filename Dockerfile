@@ -12,6 +12,8 @@ RUN npm ci && npm cache clean --force
 # Копируем исходный код
 COPY . .
 
+RUN npm run build
+
 # Этап 2: HTTP сервер для раздачи статики
 FROM node:22-alpine
 
