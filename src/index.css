@@ -14,7 +14,7 @@
   --transparent-bg: rgba(36, 36, 36, 0.29);
 
   --base-bg: rgba(255, 249, 249, 0.63);
-  --base-bg-onFocus: rgba(255, 249, 249, 0.33);
+  --base-bg-onHover: rgba(255, 249, 249, 0.33);
 
 
   --btn-hover-base: rgba(138, 154, 159, 0.49);

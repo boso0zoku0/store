@@ -6,6 +6,7 @@ import {useWsFriendly} from "../../../contexts/SocketFriendlyManager.tsx";
 import {data, useNavigate} from "react-router-dom";
 import type {Dialog} from '../../../contexts/SocketFriendlyManager'
 import Messages from "./Messages.tsx";
+import {ImArrowLeft2} from "react-icons/im";
 
 interface ClientPanelProps {
   isOpen: boolean;
@@ -22,36 +23,37 @@ interface ToUserData {
 export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps) {
   const {user} = useAuth();
   const [inputMessage, setInputMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const {wsRef, sendMessage, messages, dialogs, setDialogs, getDialog, isConnected} = useWsFriendly()
   const [toUserData, setToUserData] = useState<ToUserData | null>(null);
   const navigate = useNavigate()
   const [activeDialog, setActiveDialog] = useState('')
 
+  const to_user_url_id = to_user ? to_user : activeDialog
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
-    console.log(`mess: ${messages}`)
-  }, []);
 
   useEffect(() => {
-    scrollToBottom();
-    console.log(`to_user: ${to_user}`)
-  }, [messages, scrollToBottom]);
+    if (!to_user) return;
 
-  useEffect(() => {
-    if (to_user) {
+    const waitForConnection = async () => {
+      // Ждём, пока WebSocket не откроется
+      while (wsRef.current?.readyState !== WebSocket.OPEN) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
       setActiveDialog(to_user);
-    }
+      getDialog(user?.url_id, to_user);
+    };
+
+    waitForConnection();
   }, [to_user]);
 
   useEffect(() => {
-    if (!activeDialog) return;
+    const targetId = to_user || activeDialog;
+    if (!targetId) return;
     if (wsRef.current?.readyState !== WebSocket.OPEN) return;
 
     const fetchRecipientInfo = async () => {
       try {
-        const resp = await api.get(`/user/by?url_id=${activeDialog}`);
+        const resp = await api.get(`/user/by?url_id=${targetId}`);
         setToUserData(resp.data);
       } catch (error) {
         console.error('Ошибка получения пользователя:', error);
@@ -59,7 +61,7 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     };
 
     fetchRecipientInfo();
-  }, [activeDialog]);
+  }, [activeDialog, to_user]);  // ← оба источника
 
   const sendMsg = async () => {
     try {
@@ -109,18 +111,21 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     return null;
   }
 
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <span>
-          Chat Message {toUserData && `with ${toUserData.username}`}
+      <div className={styles.headerLayout}>
+        {activeDialog && (
+          <button className={styles.back} onClick={() => setActiveDialog('')}><ImArrowLeft2/></button>
+        )}
+        <span className={styles.header}>
+          Chat Message {toUserData && activeDialog && `with ${toUserData.username}`}
         </span>
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
       </div>
-
-      {activeDialog ? (
-        <>
-          <Messages to_user={activeDialog} messages={messages} messagesEndRef={messagesEndRef}/>
+      {(activeDialog || to_user) ? (
+        <div className={styles.chatContainer}>
+          <Messages to_user={to_user_url_id} messages={messages}/>
           <div className={styles.inputArea}>
             <input
               type="text"
@@ -133,38 +138,32 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
               Отправить
             </button>
           </div>
-        </>
-      )} : (<div></div>)
-      {/*Доработать условие. или activeDialog или мэпим диалоги(убрать <> и добавить новый стиль внутрь поместить messages и input потому что <> не корректно длля условий*/}
-
-      {/*интерфейс для списка диалогов*/}
-      {!to_user && (
-        <>
-          {dialogs.map((dialog) => (
-            <div key={dialog.id} className={styles.containerGroupDialogs}
-                 onClick={async () => {
-                   if (!dialog.is_own && !dialog.is_read_message) (
-                     await markMessage(dialog)
-                   )
-                 }}>
-              <div
-                className={styles.dialog}
-                onClick={() => openDialog(dialog)}>
-                <div className={styles.user} onClick={() => navigate(`/profile/${dialog?.from_url_id}`)}>
-                  {!dialog.is_own ? dialog.sender : 'Вы'}
-                </div>
-                <div className={styles.msg}>
-                  {dialog.message}
-                </div>
-                {!dialog.is_own && !dialog.is_read_message && (
-                  <div className={styles.checkDialog}>
-                    🔔
-                  </div>
-                )}
+        </div>
+      ) : (
+        dialogs.map((dialog) => (
+          <div key={dialog.id} className={styles.containerGroupDialogs}
+               onClick={async () => {
+                 if (!dialog.is_own && !dialog.is_read_message) (
+                   await markMessage(dialog)
+                 )
+               }}>
+            <div
+              className={styles.dialog}
+              onClick={() => openDialog(dialog)}>
+              <div className={styles.user} onClick={() => navigate(`/profile/${dialog?.from_url_id}`)}>
+                {!dialog.is_own ? dialog.recipient : dialog.sender}
               </div>
+              <div className={styles.msg}>
+                {dialog.message}
+              </div>
+              {!dialog.is_own && !dialog.is_read_message && (
+                <div className={styles.checkDialog}>
+                  🔔
+                </div>
+              )}
             </div>
-          ))}
-        </>
+          </div>
+        ))
       )}
     </div>
   );

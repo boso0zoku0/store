@@ -3,13 +3,16 @@ import {useParams} from "react-router-dom";
 import {useAuth} from "./AuthContexts.tsx";
 
 export interface Message {
-  from_user: string;
+  id: string;
   sender: string;
-  message: string;
-  to_user: string;
   recipient: string;
+  message: string;
+  created_at: string;
   is_own?: boolean;
-  type?: string; // 'bot', 'client'
+
+  from_url_id?: string;
+  to_url_id?: string;
+  type: string;
 }
 
 export interface Dialog {
@@ -71,13 +74,10 @@ export default function WSFriendlyProvider({children}) {
       } else if (data.type === 'response_dialog_history') {
           const historyDialog = data.message.map((msg) => ({
             id: msg.id,
-            from_url_id: msg.from_url_id,
-            to_url_id: msg.to_url_id,
-            recipient: msg.recipient,
             sender: msg.sender,
+            recipient: msg.recipient,
             message: msg.message,
             is_own: msg.is_own,
-            is_read_message: msg.is_read_message,
           }))
           setMessages(historyDialog)
       }
