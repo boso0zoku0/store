@@ -62,7 +62,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
 
   useEffect(() => {
     if (!isOpen) return;
-    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/clients/${clientName}`);
+    const websocket = new WebSocket(`wss://clay-shop.ru/clients/${clientName}`);
 
     websocket.onopen = () => {
       console.log('✓ WebSocket подключен');

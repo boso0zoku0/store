@@ -16,9 +16,9 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
-    allowedHosts: [
-      'intriguingly-stylish-gerbil.cloudpub.ru'
-    ],
+    // allowedHosts: [
+    //   'intriguingly-stylish-gerbil.cloudpub.ru'
+    // ],
     plugins: {
       'react-compiler': reactCompiler,
     },

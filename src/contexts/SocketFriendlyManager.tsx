@@ -54,7 +54,7 @@ export default function WSFriendlyProvider({children}) {
       return;
     }
 
-    const websocket = new WebSocket(`wss://store-backend.cloudpub.ru/friendly/dialog?url_id=${user.url_id}`)
+    const websocket = new WebSocket(`wss://clay-shop.ru/friendly/dialog?url_id=${user.url_id}`)
     websocket.onopen = () => {
       wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
       setIsConnected(true)

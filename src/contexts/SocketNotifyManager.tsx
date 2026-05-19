@@ -28,7 +28,7 @@ export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
-    const wsUrl = `wss://store-backend.cloudpub.ru/notify?url_id=${user.url_id}`;
+    const wsUrl = `wss://clay-shop.ru/notify?url_id=${user.url_id}`;
 
     const websocket = new WebSocket(wsUrl);
     wsRef.current = websocket;
