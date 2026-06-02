@@ -3,7 +3,7 @@ import {useAuth} from "../../../contexts/AuthContexts.tsx";
 import styles from "./WebSocketFriendly.module.css"
 import api from "../../../utils/auth.tsx";
 import {useWsFriendly} from "../../../contexts/SocketFriendlyManager.tsx";
-import {data, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import type {Dialog} from '../../../contexts/SocketFriendlyManager'
 import Messages from "./Messages.tsx";
 import {ImArrowLeft2} from "react-icons/im";
@@ -12,6 +12,7 @@ interface ClientPanelProps {
   isOpen: boolean;
   onClose: () => void;
   to_user?: string;
+  isMainEntrance?: boolean;
 }
 
 interface ToUserData {
@@ -20,16 +21,25 @@ interface ToUserData {
   url_id: string;
 }
 
-export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps) {
+export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: ClientPanelProps) {
   const {user} = useAuth();
   const [inputMessage, setInputMessage] = useState('');
-  const {wsRef, sendMessage, messages, dialogs, setDialogs, getDialog, isConnected} = useWsFriendly()
+  const {
+    wsRef,
+    sendMessage,
+    messages,
+    dialogs,
+    setDialogs,
+    getDialog,
+    isConnected,
+    isNewMessage,
+    setIsNewMessage
+  } = useWsFriendly()
   const [toUserData, setToUserData] = useState<ToUserData | null>(null);
   const navigate = useNavigate()
   const [activeDialog, setActiveDialog] = useState('')
 
   const to_user_url_id = to_user ? to_user : activeDialog
-
 
   useEffect(() => {
     if (!to_user) return;
@@ -46,7 +56,9 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     waitForConnection();
   }, [to_user]);
 
+
   useEffect(() => {
+    console.log('another effect')
     const targetId = to_user || activeDialog;
     if (!targetId) return;
     if (wsRef.current?.readyState !== WebSocket.OPEN) return;
@@ -61,10 +73,13 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
     };
 
     fetchRecipientInfo();
-  }, [activeDialog, to_user]);  // ← оба источника
+  }, [activeDialog, to_user, messages]);  // ← оба источника
 
   const sendMsg = async () => {
     try {
+      if (!inputMessage.trim()) {
+        return
+      }
       sendMessage({
         from_url_id: user?.url_id,
         to_url_id: toUserData?.url_id,
@@ -78,23 +93,30 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
       console.log(`error friendly ws: ${err}`)
     }
   };
-  const markMessage = async (dialog: Dialog) => {
+  const markDialogRead = async (dialog: Dialog) => {
     if (!dialog.is_read_message) {
       const updatedDialogs = dialogs.map(d =>
         d.id === dialog.id ? {...d, is_read_message: true} : d
       );
       setDialogs(updatedDialogs);
-      await api.get(`/mark-message?current_url_id=${user?.url_id}&interlocutor_url_id=${dialog.from_url_id}`);
+      await api.get(`/mark-dialog-as-read?current_url_id=${user?.url_id}&interlocutor_url_id=${dialog.from_url_id}`);
+      if (isNewMessage) {
+        setIsNewMessage(false)
+      }
+      wsRef.current?.send(JSON.stringify({
+        type: 'request_is_new_message',
+        url_id: user?.url_id
+      }));
     }
   };
 
-
-  // Обработка Enter в поле ввода
-  const handleKeyPress = async (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = async (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       await sendMsg();
     }
   };
+
   const openDialog = (dialog: Dialog) => {
     const interlocutorId = dialog.from_url_id === user?.url_id
       ? dialog.to_url_id
@@ -115,8 +137,8 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
   return (
     <div className={styles.container}>
       <div className={styles.headerLayout}>
-        {activeDialog && (
-          <button className={styles.back} onClick={() => setActiveDialog('')}><ImArrowLeft2/></button>
+        {activeDialog && isMainEntrance && (
+          <button className={styles.back} onClick={() => setActiveDialog('')}><ImArrowLeft2 size={22} /></button>
         )}
         <span className={styles.header}>
           Chat Message {toUserData && activeDialog && `with ${toUserData.username}`}
@@ -132,6 +154,7 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
               placeholder="Введите сообщение..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
               disabled={!isConnected}
             />
             <button onClick={sendMsg} disabled={!isConnected}>
@@ -144,14 +167,14 @@ export default function WsFriendly({isOpen, onClose, to_user}: ClientPanelProps)
           <div key={dialog.id} className={styles.containerGroupDialogs}
                onClick={async () => {
                  if (!dialog.is_own && !dialog.is_read_message) (
-                   await markMessage(dialog)
+                   await markDialogRead(dialog)
                  )
                }}>
             <div
               className={styles.dialog}
               onClick={() => openDialog(dialog)}>
               <div className={styles.user} onClick={() => navigate(`/profile/${dialog?.from_url_id}`)}>
-                {!dialog.is_own ? dialog.recipient : dialog.sender}
+                {!dialog.is_own ? dialog.sender : dialog.recipient}
               </div>
               <div className={styles.msg}>
                 {dialog.message}

@@ -24,8 +24,6 @@ export default function ShoppingCart() {
           console.log(response.data)
           setCartItems(response.data);
           setLogin(false)
-
-
         } else {
           setLogin(true)
           setCartItems([]);

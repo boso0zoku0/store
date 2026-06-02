@@ -1,0 +1,123 @@
+.navbar {
+  display: flex;
+  position: fixed;
+  width: 100%;
+  border-bottom: 1px solid rgb(135, 135, 135);
+  z-index: 100;
+  top: 0;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  background: var(--background-dark);
+  padding: 0 16px;
+}
+
+.btnBurger {
+  display: flex;
+  cursor: pointer;
+  padding: 0 16px;
+  transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  background: none;
+  border: none;
+  outline: none;
+  line-height: 0;
+
+}
+
+.rightIcons {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.containerBurger {
+  display: flex;
+  position: absolute;
+  padding: 15px 0;
+  top: 70px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: auto;
+  background-color: var(--background-dark);
+  border-radius: 20px;
+  overflow-y: auto;
+
+}
+
+.burgerPages {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+}
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  width: 70%;
+  padding: 14px 16px;
+  text-align: center;
+  gap: 5px;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 2px solid #333;
+  background: rgba(0, 0, 0, 0.05);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    flex-shrink: 1;
+  }
+}
+
+.page:active {
+  background-color: var(--background-white);
+}
+
+/*.page {*/
+/*  font-size: 20px;*/
+/*  width: 70%;*/
+/*  padding: 14px 16px;*/
+/*  text-align: center;*/
+/*  gap: 5px;*/
+/*  cursor: pointer;*/
+/*  border-radius: 10px;*/
+/*  border: 2px solid #333;*/
+/*  background: rgba(0, 0, 0, 0.05);*/
+
+
+/*.iconChat {*/
+/*  background: none;*/
+/*  border: none;*/
+/*  padding: 0;*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  justify-content: center;*/
+/*  line-height: 0;*/
+/*  outline: none;*/
+/*}*/
+
+
+
+/*.rightIcons a {*/
+/*  padding: 10px;*/
+/*  cursor: pointer;*/
+/*  transition: transform 0.15s cubic-bezier(0.2, 0.9, 0.4, 1.1);*/
+/*}*/
+
+
+.menuIcon:active,
+.rightIcons img:active {
+  background-color: var(--base-bg);
+  transform: scale(0.92);
+}
+

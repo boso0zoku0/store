@@ -1,0 +1,141 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.searchWrapper {
+  display: flex;
+  width: 100%;
+  padding: 0.5em 1em;
+  margin: 100px 0 20px;
+  justify-content: flex-end;
+}
+
+.searchInput {
+  padding: 12px 20px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgb(79, 79, 79);
+  border-radius: 40px;
+  outline: none;
+}
+.searchInput:hover {
+  background-color: var(--btn-hover-base);
+  transition: all 0.1s ease
+}
+
+.btnSearch {
+  padding: 12px 20px;
+  margin-left: 8px;
+  background: rgba(30, 30, 35, 0.95);
+  border: 1px solid rgb(90, 90, 90);
+  border-radius: 40px;
+  cursor: pointer;
+}
+.btnSearch:focus {
+  background-color: var(--btn-hover-base);
+  transition: all 0.1s ease
+}
+.prodWrap {
+  display: flex;
+  position: relative;
+  width: 90%;
+  height: 6em;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.63);
+  border-radius: 20px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: 100% 10%;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  will-change: transform;        /* ← ускоряет рендеринг */
+  touch-action: pan-y;           /* ← разрешаем вертикальный скролл, горизонтальный блокируем */
+}
+.prodWrap:active {
+  cursor: grabbing;
+}
+.prodWrap.swiping {
+  transition: none;              /* ← при свайпе без плавности */
+}
+.prodWrap.removing {
+  transform: translateX(-100%);
+  opacity: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.deleteBtn {
+  position: absolute;
+  left: -60px;
+  top: 0;
+  bottom: 0;
+  width: 50px;
+  background: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px 0 0 20px;
+  color: white;
+}
+
+
+.prodName {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  max-width: 60%;
+  word-wrap: break-word;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.prodPrice {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  transform: rotate(-10deg);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+}
+.pay {
+  display: flex;
+  margin: 7em;
+}
+.pay > button {
+  width: 10em;
+  height: 4em;
+  background-color: rgba(0, 128, 0, 0.58);
+  border-radius: 20px;
+  opacity: 1;
+}
+.pay > button:active {
+  opacity: 0.5;
+  transform: scale(0.97);
+}
+
+.emptyCart {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(209, 194, 172, 0.6);
+  font-size: 16px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #d1c2ac;
+}

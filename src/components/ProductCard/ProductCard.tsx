@@ -136,12 +136,11 @@ export default function ProductCards() {
   return (
     <>
       <div className={styles.catalogLayout}>
-        <ProductFilters
-          onFilterChange={setFilters}
-          priceFilterEnabled={priceFilterEnabled}
-          onPriceFilterToggle={handlePriceFilterToggle}
-        />
-
+        {/*<ProductFilters*/}
+        {/*  onFilterChange={setFilters}*/}
+        {/*  priceFilterEnabled={priceFilterEnabled}*/}
+        {/*  onPriceFilterToggle={handlePriceFilterToggle}*/}
+        {/*/>*/}
         <div className={styles.productsGrid}>
           {products?.map((product) => {
             const isHovering = hoverStates[product.id] || false;
@@ -184,7 +183,6 @@ export default function ProductCards() {
                     loading="lazy"
                     onClick={() => openModal(product)}
                   />
-
                   {isHovering && photos.length > 1 && (
                     <div>
                       {photos.map((_, idx) => (
@@ -195,7 +193,6 @@ export default function ProductCards() {
                     </div>
                   )}
                 </div>
-
                 <div className={styles.productInfo}>
                   <h3 className={styles.productTitle}>{truncateText(product.name)}</h3>
                   <p className={styles.productDescription}>{product.description?.type || ''}</p>

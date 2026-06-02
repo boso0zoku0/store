@@ -66,7 +66,6 @@ export default function LoginHelper({isLoading, setIsLoading, setError}:LoginHel
           className={styles.input}
           placeholder="Введите имя"
           required
-
         />
       </div>
 

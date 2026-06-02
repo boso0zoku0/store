@@ -22,9 +22,7 @@ export default function Messages({to_user, messages}: MessagesProps) {
   if (!to_user) {
     return null
   }
-  useEffect(() => {
-    console.log(`messages: ${messages}`)
-  }, []);
+
   return (
     <div className={styles.messages}>
       {messages.map((msg, index) => (
@@ -32,7 +30,7 @@ export default function Messages({to_user, messages}: MessagesProps) {
           key={index}
           className={`${styles.message} ${msg.is_own ? styles.ownMessage : styles.otherMessage}`}
         >
-          <span className={styles.messageUsername}>{msg.is_own ? 'Вы:' : msg.sender}</span>
+          <span className={styles.messageUsername}>{msg.is_own ? 'Вы: ':`${msg.sender}: `}</span>
           <span className={styles.messageText}>{msg.message}</span>
         </div>
       ))}
