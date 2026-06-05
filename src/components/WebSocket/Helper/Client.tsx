@@ -72,7 +72,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
     websocket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('Получено сообщение:', data);
 
         if (data.type === "operator_message") {
           const newMessage: ClientMessage = {
@@ -85,6 +84,20 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           };
           operator.current = data.from;
           setMessages(prev => [...prev, newMessage]);
+
+        } else if (data.type === "connect_confirm") {
+          operator.current = data.from;
+          const newMessage: ClientMessage = {
+            id: Date.now().toString() + Math.random(),
+            message: data.message,
+            username: 'Bot',
+            type: 'system_message',
+            timestamp: new Date(),
+            isOwn: false,
+            isButton: false,
+          }
+          setMessages(prevState => [...prevState, newMessage])
+
         } else if (data.type === "media") {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
@@ -159,6 +172,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
             isButton: false
           };
           setMessages(prev => [...prev, newMessage]);
+          //   Точно ли верно условие else одиночное?
         } else {
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),

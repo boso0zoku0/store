@@ -1,12 +1,11 @@
-/* ========== ОСНОВНОЙ КОНТЕЙНЕР (миниатюрный) ========== */
 .chatContainer {
   display: flex;
   position: fixed;
   flex-direction: column;
   bottom: 90px;
   right: 24px;
-  width: 380px;
-  height: 560px;
+  width: 25%;
+  height: 65vh;
   background: white;
   border-radius: 20px;
   overflow: hidden;

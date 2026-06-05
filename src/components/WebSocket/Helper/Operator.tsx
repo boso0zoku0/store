@@ -68,37 +68,30 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
             );
           }
         }
-        if (data.type == "notify_connect") {
+        if (data.type == "connect_request") {
           console.log('🔔 Новый клиент:', data.from);
           const newClient = data.from
 
           setClients(prev => {
             const exists = prev.some(c => c.username === data.from);
             if (exists) {
-              console.log('Клиент уже есть в списке');
               return prev;
             }
-            console.log('➕ Добавляем нового клиента:', data.from);
             return [...prev, {
               username: newClient,
               isActive: true,
               unreadCount: 1
             }];
           });
-          const newMessage: OperatorMessage = {
-            id: Date.now().toString() + Math.random(),
-            message: 'Новый клиент нуждается в помощи',
-            username: newClient,
-            timestamp: new Date(),
-            is_own: false,
-            type: "notify_connect"
-          };
-
-          setMessages((prev) => ({
-            ...prev,
-            [data.from]: [...(prev[data.from] || []), newMessage],
-          }));
           loadClients({setClients}).catch(err => console.error('Ошибка загрузки клиентов:', err));
+          const confirmConnect = ({
+            "type": "connect_confirm",
+            "from": operatorName,
+            "to": data.from,
+            "message": `Operator ${operatorName} has joined chat!`
+          })
+          ws?.send(JSON.stringify(confirmConnect))
+          console.log('Подтверждение о подключении отправлено клиенту')
         } else if (data.type == "media") {
           console.log(data.type)
           const newMessage: OperatorMessage = {
@@ -144,6 +137,15 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
     setWs(websocket)
 
   }, [selectedClient])
+
+  const handleAcceptConnect = (username: string) => {
+    const acceptConnect = ({
+      "type": "accept_client",
+      "from": operatorName,
+      "to": username
+    })
+    ws?.send(JSON.stringify(acceptConnect))
+  }
 
   // Отправка сообщения
   const sendMessage = async (e: React.FormEvent) => {
@@ -226,7 +228,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
           clients.map((client) => (
             <button
               key={client.username}
-              onClick={() => setSelectedClient(client.username)}
+              onClick={() => {setSelectedClient(client.username); handleAcceptConnect(client.username)}}
               className={`${styles.clientItem} ${selectedClient === client.username ? styles.clientItemActive : ''}`}
             >
               <div className={styles.clientInfo}>
@@ -248,10 +250,8 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
           ))
         )}
       </div>
-
       <div className={styles.chatArea}>
         {!selectedClient ? (
-
           <div className={styles.noClientMessage}>Выберите клиента для начала общения</div>
         ) : (
           <>
