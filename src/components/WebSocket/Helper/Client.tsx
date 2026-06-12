@@ -1,5 +1,4 @@
-// components/ChatButton/Client.tsx
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useLayoutEffect} from 'react';
 import styles from './ChatWindowClient.module.css';
 import type {ClientMessage, ClientPanelProps} from "../interfaces.tsx"
 import api from "../../../utils/auth.tsx";
@@ -16,30 +15,53 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
   const [isUploading, setIsUploading] = useState(false);
   const [inputValue, setInputValue] = useState('')
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+
+  useLayoutEffect(() => {
+    messagesEndRef.current?.scrollIntoView();
   }, [messages]);
 
-  useEffect(() => {
-    api.get(`/get-user-dialog?username=${operator}`)
+
+  const saveOperatorStorage = (username: string) => {
+    const lastOperator = localStorage.getItem('lastOperator');
+    if (lastOperator !== username) {
+      localStorage.setItem('lastOperator', username);
+    }
+    const operators = JSON.parse(localStorage.getItem('operators') || '[]');
+    if (!operators.includes(username)) {
+      operators.push(username);
+      localStorage.setItem('operators', JSON.stringify(operators));
+    }
+  };
+  const getHistoryDialog = () => {
+    const user = localStorage.getItem('lastOperator')
+    if (!user) {
+      return
+    }
+    api.get(`/get-user-dialog?operator=${user}&client=${clientName}`)
       .then((response) => {
         const messageTransform = response.data.map((data) => ({
           id: data.id,
           message: data.message,
-          username: data.username,
-          timestamp: new Date(data.created_at),
-          isOwn: data.type_message == 'client',
-          type: data.type_message
+          operator: data.operator,
+          client: data.client,
+          created_at: new Date(),
+          isOwn: data.is_own,
+          type: data.type,
+          file_url: data.file_url ?? null,
+          mime_type: data.mime_type ?? null,
+
         }))
         setMessages(messageTransform)
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView();
+        }, 50);
       })
 
       .catch(error => {
         console.error('Ошибка загрузки истории:', error);
       });
-  }, []);
+  }
 
   // Очистка превью при размонтировании
   useEffect(() => {
@@ -50,15 +72,11 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
     };
   }, [filePreview]);
 
-  useEffect(() => {
-    if (!isOpen && ws) {
-      ws.close();
-      setWs(null);
-      setIsConnected(false);
-      setMessages([]);
-    }
-  }, [isOpen, ws]);
-
+  // useEffect(() => {
+  //   ws?.close();
+  //   setWs(null);
+  //   setIsConnected(false);
+  // }, [isOpen, ws]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -66,6 +84,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
 
     websocket.onopen = () => {
       console.log('✓ WebSocket подключен');
+      getHistoryDialog()
       setIsConnected(true);
     };
 
@@ -77,8 +96,8 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
-            username: data.from || 'Оператор',
-            timestamp: new Date(),
+            operator: data.from || 'Оператор',
+            created_at: new Date(),
             isOwn: false,
             type: 'operator_message'
           };
@@ -87,25 +106,19 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
 
         } else if (data.type === "connect_confirm") {
           operator.current = data.from;
-          const newMessage: ClientMessage = {
-            id: Date.now().toString() + Math.random(),
-            message: data.message,
-            username: 'Bot',
-            type: 'system_message',
-            timestamp: new Date(),
-            isOwn: false,
-            isButton: false,
-          }
-          setMessages(prevState => [...prevState, newMessage])
+          // Для запроса диалога
+          saveOperatorStorage(operator.current)
+          getHistoryDialog()
 
         } else if (data.type === "media") {
+          console.log(`file_url сообщения: ${data.file_url}`)
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
-            username: data.from || 'Оператор',
-            timestamp: new Date(),
+            operator: data.from || 'Оператор',
+            created_at: new Date(),
             isOwn: false,
-            type: 'media',
+            type: data.type,
             mime_type: data.mime_type,
             file_url: data.file_url
           };
@@ -118,23 +131,23 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
                 const newMessage: ClientMessage = {
                   id: Date.now().toString() + Math.random(),
                   message: msg,
-                  username: 'Bot',
-                  timestamp: new Date(),
+                  operator: 'Бот',
+                  created_at: new Date(),
                   isOwn: false,
                   isButton: true,
                   type: 'bot_message'
                 };
                 setMessages(prev => [...prev, newMessage]);
-              }, index * 1000);
+              }, index * 300);
             });
           } else {
             const newMessage: ClientMessage = {
               id: Date.now().toString() + Math.random(),
               message: data.message,
-              username: 'Система',
-              timestamp: new Date(),
+              operator: 'Бот',
+              created_at: new Date(),
               isOwn: false,
-              type: 'system_message',
+              type: 'bot_message',
               isButton: false
             };
             setMessages(prev => [...prev, newMessage]);
@@ -143,8 +156,8 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
-            username: 'Bot',
-            timestamp: new Date(),
+            operator: 'Bot',
+            created_at: new Date(),
             isOwn: false,
             type: 'bot_message',
             isButton: false
@@ -154,33 +167,10 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
           const newMessage: ClientMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message,
-            username: 'Система',
-            timestamp: new Date(),
+            operator: 'Бот',
+            created_at: new Date(),
             isOwn: false,
-            type: 'system',
-            isButton: false
-          };
-          setMessages(prev => [...prev, newMessage]);
-        } else if (data.type === "notify_connect_to_client") {
-          const newMessage: ClientMessage = {
-            id: Date.now().toString() + Math.random(),
-            message: data.message,
-            username: 'Система',
-            timestamp: new Date(),
-            isOwn: false,
-            type: 'system',
-            isButton: false
-          };
-          setMessages(prev => [...prev, newMessage]);
-          //   Точно ли верно условие else одиночное?
-        } else {
-          const newMessage: ClientMessage = {
-            id: Date.now().toString() + Math.random(),
-            message: data.message || JSON.stringify(data),
-            username: data.from || 'Система',
-            timestamp: new Date(),
-            isOwn: false,
-            type: 'system',
+            type: 'bot_message',
             isButton: false
           };
           setMessages(prev => [...prev, newMessage]);
@@ -190,10 +180,10 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
         const newMessage: ClientMessage = {
           id: Date.now().toString() + Math.random(),
           message: event.data,
-          username: 'Система',
-          timestamp: new Date(),
+          operator: 'Бот',
+          created_at: new Date(),
           isOwn: false,
-          type: 'system',
+          type: 'bot_message',
           isButton: false
         };
         setMessages(prev => [...prev, newMessage]);
@@ -221,6 +211,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
     };
   }, [isOpen, clientName]);
 
+
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ws || !isConnected) return;
@@ -233,6 +224,8 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
       if (uploadResult) {
         mediaUrl = uploadResult.url;
         mediaType = uploadResult.type;
+        console.log(`media_url: ${mediaUrl}`)
+        console.log(`media_type: ${mediaType}`)
       } else {
         return;
       }
@@ -240,7 +233,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
     if (!inputValue.trim() && !mediaUrl) {
       return;
     }
-
     const messageData: any = {
       message: inputValue || '',
       from: clientName,
@@ -257,8 +249,9 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
     const newMessage: ClientMessage = {
       id: Date.now().toString() + Math.random(),
       message: inputValue,
-      username: clientName,
-      timestamp: new Date(),
+      operator: operator.current,
+      client: clientName,
+      created_at: new Date(),
       isOwn: true,
       type: 'client',
       file_url: mediaUrl,
@@ -273,7 +266,6 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
       fileInputRef: fileInputRef
     })
   };
-
 
   return (
     <div className={styles.chatContainer}>
@@ -302,6 +294,7 @@ export default function ChatClient({isOpen, clientName, onClose}: ClientPanelPro
               <ClientMessageBubble
                 key={msg.id}
                 message={msg}
+                clientName={clientName}
                 onBotMessageClick={(text) => {
                   if (ws && isConnected) {
                     ws.send(JSON.stringify({message: text, from: clientName, to: 'operator'}));

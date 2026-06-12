@@ -1,7 +1,6 @@
 import {createContext, useContext, useEffect, useRef, useState} from "react";
 import {useParams} from "react-router-dom";
-import {useAuth} from "./AuthContexts.tsx";
-import api from "../utils/auth.tsx";
+import {useAuth} from "./Auth.tsx";
 
 export interface Message {
   id: string;
@@ -38,7 +37,6 @@ interface TypeContext {
   isConnected: boolean;
 }
 
-
 const WsFriendlyContext = createContext<TypeContext | null>(null)
 
 export default function WSFriendlyProvider({children}) {
@@ -59,8 +57,8 @@ export default function WSFriendlyProvider({children}) {
 
     const websocket = new WebSocket(`wss://clay-shop.ru/friendly/dialog?url_id=${user.url_id}`)
     websocket.onopen = () => {
-      wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
       wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
+      wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
       setIsConnected(true)
     }
     websocket.onmessage = (event) => {
@@ -71,9 +69,9 @@ export default function WSFriendlyProvider({children}) {
           ...data,
           is_own: data.from_url_id === user?.url_id
         };
-        setMessages(prev => [...prev, msg]);
         wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
         wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
+        setMessages(prev => [...prev, msg]);
 
       } else if (data.type === 'response_dialogs_history') {
         setDialogs(data.message)
@@ -101,6 +99,12 @@ export default function WSFriendlyProvider({children}) {
       console.log('WebSocket Friendly отключен но продолжает жить');
     };
     wsRef.current = websocket
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
 
   }, [url_id, isAuthenticated]);
   const sendMessage = (data: any) => {

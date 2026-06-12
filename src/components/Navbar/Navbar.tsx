@@ -3,9 +3,9 @@ import {Envelope3DIcon} from "../../Icons/IconChatWsFriendly.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
 import React, {useEffect, useState} from "react";
 import {User} from "lucide-react";
-import {useWsFriendly} from "../../contexts/SocketFriendlyManager.tsx";
+import {useWsFriendly} from "../../contexts/SocketFriendly.tsx";
 
-export default function Navbar({isAuthenticated, isLoading, user}) {
+export default function Navbar({isAuthenticated, user}) {
   const [isOpen, setIsOpen] = useState(false)
   const {isNewMessage} = useWsFriendly()
 
@@ -15,7 +15,6 @@ export default function Navbar({isAuthenticated, isLoading, user}) {
         <ul className={styles.navLinks}>
           <li><a href="/products">Изделия</a></li>
           <li><a href="/cart">Корзина</a></li>
-          {/*<li><a href="/requisites">Реквизиты Разработчика</a></li>*/}
         </ul>
         <div className={styles.navRight}>
           {isAuthenticated ? (<a href={`/profile/${user?.url_id}`} aria-label="Профиль">
@@ -37,5 +36,6 @@ export default function Navbar({isAuthenticated, isLoading, user}) {
         <WsFriendly isOpen={isOpen} onClose={() => setIsOpen(!isOpen)} isMainEntrance={true}/>
       )}
     </nav>
+
   )
 }

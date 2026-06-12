@@ -5,7 +5,7 @@ import {showToast} from "../ToastCheckout/Toast.tsx";
 import type {CartItem} from "./interfaces.tsx";
 import api, {isAuthenticated} from "../../utils/auth.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
-import {useAuth} from "../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../contexts/Auth.tsx";
 
 
 export default function ShoppingCart() {

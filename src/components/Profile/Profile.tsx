@@ -8,7 +8,7 @@ import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import api from "../../utils/auth.tsx";
 import type {GeneralData} from "./interfaces.tsx";
-import {useAuth} from "../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../contexts/Auth.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
 
 export default function Profile() {

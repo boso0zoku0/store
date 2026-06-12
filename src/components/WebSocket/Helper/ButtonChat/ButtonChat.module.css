@@ -1,6 +1,6 @@
 /* ChatButton.module.css */
 .chatButton {
-  position: fixed;   /* 👈 ОБЯЗАТЕЛЬНО fixed, не absolute */
+  position: fixed;
   bottom: 24px;
   right: 24px;
   width: 56px;
@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;  /* 👈 высокий z-index */
+  z-index: 9999;
   background: #C47A4E;
 }
 
@@ -28,4 +28,19 @@
   height: 28px;
   color: white;
   fill: white;
+}
+
+.pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+  }
 }

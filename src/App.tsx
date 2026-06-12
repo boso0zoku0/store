@@ -13,25 +13,19 @@ import {ToastContainer} from "react-toastify";
 import Login from "./components/Auth/Login/Login.tsx";
 import ProductFilters from "./components/ProductFulter/Filter.tsx";
 import Register from "./components/Auth/Registrations/Registrations.tsx";
-import {AuthProvider} from "./contexts/AuthContexts.tsx";
+import {AuthProvider} from "./contexts/Auth.tsx";
 import Layout from "./components/Layout.tsx";
 import {LeftSidebar} from "./learn/Learn.tsx";
-import {WsNotifyProvider} from "./contexts/SocketNotifyManager.tsx";
-import WSFriendlyProvider from "./contexts/SocketFriendlyManager.tsx";
+import {WsNotifyProvider} from "./contexts/SocketNotify.tsx";
+import WSFriendlyProvider from "./contexts/SocketFriendly.tsx";
 import {useMediaQuery} from 'react-responsive';
 import {useEffect, useState} from "react";
 import ShoppingCartMobile from "./components/Cart/ShoppingCartMobile.tsx";
 
 
 function App() {
-  const [isMounted, setIsMounted] = useState(false);
   const isMobile = useMediaQuery({maxWidth: 768});
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) return null; // или лоадер
   return (
     <AuthProvider>
       <WSFriendlyProvider>
@@ -50,7 +44,6 @@ function App() {
                   {/*<Route path={"/requisites"} element={<Requisites/>}/>*/}
                   <Route path={"/login"} element={<Login/>}/>
                   <Route path={"/register"} element={<Register/>}/>
-                  <Route path={"/profile/:id"} element={isMobile ? <Profile/> : <ProfileMobile/>}/>
                   {/*<Route path={"/"} element={<Hero/>}/>*/}
                   <Route path={"/l"} element={<LeftSidebar/>}/>
                   <Route path="/f" element={<ProductFilters onFilterChange={() => {

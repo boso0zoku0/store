@@ -3,20 +3,20 @@ import {Outlet} from 'react-router-dom';
 import Navbar from "./Navbar/Navbar.tsx";
 import ChatButton from "./WebSocket/Helper/ButtonChat/ButtonChat.tsx";
 import {FloatingNotificationManager} from "./WebSocket/Notify/Manager.tsx";
-import {useAuth} from "../contexts/AuthContexts.tsx";
+import {useAuth} from "../contexts/Auth.tsx";
 import NavbarMobile from "./Navbar/NavbarMobile.tsx";
 import {useMediaQuery} from 'react-responsive';
 
 export default function Layout() {
-  const {isAuthenticated, isLoading, user} = useAuth();
+  const {isAuthenticated, user} = useAuth();
   const isMobile = useMediaQuery({maxWidth: 768})
 
   return (
     <div className="layout">
       {isMobile ? (
         <>
-          <main className="main-content">
-            <NavbarMobile isAuthenticated={isAuthenticated} user={user}/>
+          <NavbarMobile isAuthenticated={isAuthenticated} user={user}/>
+          <main>
             <Outlet/>
           </main>
           <ChatButton/>
@@ -24,8 +24,8 @@ export default function Layout() {
         </>
       ) : (
         <>
-          <Navbar isAuthenticated={isAuthenticated} isLoading={isLoading} user={user}/>
-          <main className="main-content">
+          <Navbar isAuthenticated={isAuthenticated} user={user}/>
+          <main>
             <Outlet/>
           </main>
           <ChatButton/>

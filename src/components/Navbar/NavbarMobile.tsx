@@ -1,12 +1,11 @@
 import styles from "./NavbarMobile.module.css"
 import React, {useEffect, useState} from "react";
-import {useWsFriendly} from "../../contexts/SocketFriendlyManager.tsx";
+import {useWsFriendly} from "../../contexts/SocketFriendly.tsx";
 import {Menu} from 'lucide-react';
 import {Envelope3DIcon} from "../../Icons/IconChatWsFriendly.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
 import {User} from "lucide-react";
 import {CartIcon} from "../../Icons/CartIcon.tsx";
-import {useAuth} from "../../contexts/AuthContexts.tsx";
 import {useNavigate} from "react-router-dom";
 import {GiClayBrick} from "react-icons/gi";
 

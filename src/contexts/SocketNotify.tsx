@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useRef, ReactNode, useState, MutableRefObject} from 'react';
-import {useAuth} from './AuthContexts.tsx';
+import {useAuth} from './Auth.tsx';
 
 interface WebSocketContextType {
   wsRef: React.MutableRefObject<WebSocket | null>;

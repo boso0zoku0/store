@@ -1,10 +1,10 @@
 import {useEffect, useState, useRef, useCallback} from 'react';
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../../contexts/Auth.tsx";
 import styles from "./WebSocketFriendly.module.css"
 import api from "../../../utils/auth.tsx";
-import {useWsFriendly} from "../../../contexts/SocketFriendlyManager.tsx";
+import {useWsFriendly} from "../../../contexts/SocketFriendly.tsx";
 import {useNavigate} from "react-router-dom";
-import type {Dialog} from '../../../contexts/SocketFriendlyManager'
+import type {Dialog} from '../../../contexts/SocketFriendly.tsx'
 import Messages from "./Messages.tsx";
 import {ImArrowLeft2} from "react-icons/im";
 
@@ -45,7 +45,6 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
     if (!to_user) return;
 
     const waitForConnection = async () => {
-      // Ждём, пока WebSocket не откроется
       while (wsRef.current?.readyState !== WebSocket.OPEN) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -54,11 +53,10 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
     };
 
     waitForConnection();
-  }, [to_user]);
+  }, [to_user, isNewMessage]);
 
 
   useEffect(() => {
-    console.log('another effect')
     const targetId = to_user || activeDialog;
     if (!targetId) return;
     if (wsRef.current?.readyState !== WebSocket.OPEN) return;
@@ -179,7 +177,7 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
               <div className={styles.msg}>
                 {dialog.message}
               </div>
-              {!dialog.is_own && !dialog.is_read_message && (
+              {!dialog.is_read_message && !dialog.is_own && (
                 <div className={styles.checkDialog}>
                   🔔
                 </div>

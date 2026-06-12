@@ -15,8 +15,6 @@ export const Envelope3DIcon: React.FC<Envelope3DIconProps> = ({
   className = "",
   hasNotification
 }) => {
-  console.log('rerender icon')
-  console.log('value new msg from icon', hasNotification)
 
   return (
     <div

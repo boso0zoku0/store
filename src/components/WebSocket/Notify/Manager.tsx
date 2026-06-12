@@ -2,8 +2,8 @@
 import {motion, AnimatePresence} from 'motion/react';
 import {useState, useEffect, useRef} from 'react';
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
-import {useWsNotify} from "../../../contexts/SocketNotifyManager.tsx";
+import {useAuth} from "../../../contexts/Auth.tsx";
+import {useWsNotify} from "../../../contexts/SocketNotify.tsx";
 
 interface FloatingNotificationProps {
   username: string;

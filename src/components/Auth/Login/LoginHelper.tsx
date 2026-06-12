@@ -1,7 +1,7 @@
 import {useState} from "react";
 import styles from "./Login.module.css";
 import api, {setTokens} from "../../../utils/auth.tsx";
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../../contexts/Auth.tsx";
 import {useNavigate} from "react-router-dom";
 
 

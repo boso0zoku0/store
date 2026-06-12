@@ -2,15 +2,22 @@
   display: flex;
   position: fixed;
   flex-direction: column;
-  bottom: 90px;
   right: 24px;
-  width: 25%;
-  height: 65vh;
+  width: 90%;
+  height: 75vh;
+  bottom: 3rem;
   background: white;
   border-radius: 20px;
   overflow: hidden;
   z-index: 9998;
   animation: slideUp 0.3s ease;
+}
+@media (min-width: 768px) {
+  .chatContainer {
+    width: 20%;
+    height: 65vh;
+    bottom: 5.6rem;
+  }
 }
 
 @keyframes slideUp {
