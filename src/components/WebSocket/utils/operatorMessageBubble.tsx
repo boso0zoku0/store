@@ -59,19 +59,19 @@ export const OperatorMessageBubble = ({message}: { message: Message }) => {
               <div className="mb-2">
                 {message.mime_type?.startsWith('image/') ? (
                   <img
-                    src={`http://localhost:8000${message.file_url}`}
-                    alt="изображение"
+                    src={message.file_url}
+                    alt={message.id}
                     className="max-w-full rounded-lg max-h-64 object-contain"
                   />
                 ) : message.mime_type?.startsWith('video/') ? (
                   <video
-                    src={`http://localhost:8000${message.file_url}`}
+                    src={message.file_url}
                     controls
                     className="max-w-full rounded-lg max-h-64"
                   />
                 ) : (
                   <a
-                    href={`http://localhost:8000${message.file_url}`}
+                    href={message.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white underline"

@@ -13,7 +13,7 @@ interface ClientMessageBubbleProps {
 
 export const ClientMessageBubble = ({message, onBotMessageClick, ws, clientName}: ClientMessageBubbleProps) => {
 
-  const isBot = message.type === 'bot';
+  const isBot = message.type === 'bot' || message.type === 'connect_confirm';
   const isClient = message.type === 'client';
   const isOperator = message.type === 'operator';
   const isMedia = message.type === 'media';
@@ -46,6 +46,12 @@ export const ClientMessageBubble = ({message, onBotMessageClick, ws, clientName}
 
   const renderMediaContent = () => {
     if (!message.file_url) return null;
+    console.log("🔍 renderMediaContent:", {
+        file_url: message.file_url,
+        mime_type: message.mime_type,
+        startsWithImage: message.mime_type?.startsWith('images'),
+        startsWithVideo: message.mime_type?.startsWith('video')
+    });
     if (message.mime_type?.startsWith('image')) {
       return (
         <div className="media-content">

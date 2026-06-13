@@ -38,6 +38,8 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
   const [toUserData, setToUserData] = useState<ToUserData | null>(null);
   const navigate = useNavigate()
   const [activeDialog, setActiveDialog] = useState('')
+  console.log(`is main entrance: ${isMainEntrance}`)
+  console.log(`to_user: ${to_user}`)
 
   const to_user_url_id = to_user ? to_user : activeDialog
 
@@ -132,6 +134,11 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
   }
 
 
+  // getDialog вызвали - значит с этого момента все сообщения между текущим юзером и его собеседником(от лица
+  // текущего юзера - считаются прочитанными, если нажали x(closeBtn) или на ImArrowLeft2 то мы не в диалоге)
+  // 2 вариант. переменная in_dialog в бд, перечисляем кто из юзеров в диалоге, при вставке сообщения в бд,
+  // проверять, если юзер1 в диалоге, а сообщение поступило от юзера2, то is_read=True, и аналогично
+  // if юзер2 in_dialog , а сообщениие поступило от юзер1, то is_read=True принудительно
   return (
     <div className={styles.container}>
       <div className={styles.headerLayout}>
