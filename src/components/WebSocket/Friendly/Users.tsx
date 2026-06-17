@@ -33,29 +33,25 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
     getDialog,
     isConnected,
     isNewMessage,
-    setIsNewMessage
+    setIsNewMessage,
+    endDialog,
   } = useWsFriendly()
   const [toUserData, setToUserData] = useState<ToUserData | null>(null);
   const navigate = useNavigate()
   const [activeDialog, setActiveDialog] = useState('')
-  console.log(`is main entrance: ${isMainEntrance}`)
-  console.log(`to_user: ${to_user}`)
-
-  const to_user_url_id = to_user ? to_user : activeDialog
+  const [toUserUrlId, setToUserUrlId] = useState('')
 
   useEffect(() => {
-    if (!to_user) return;
+    if (endDialog === toUserUrlId) {
+      setToUserUrlId('')
+    }
+    if (to_user) {
+      setToUserUrlId(to_user)
+    } else {
+      setToUserUrlId(activeDialog)
+    }
 
-    const waitForConnection = async () => {
-      while (wsRef.current?.readyState !== WebSocket.OPEN) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      setActiveDialog(to_user);
-      getDialog(user?.url_id, to_user);
-    };
-
-    waitForConnection();
-  }, [to_user, isNewMessage]);
+  }, [to_user, activeDialog]);
 
 
   useEffect(() => {
@@ -74,6 +70,11 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
 
     fetchRecipientInfo();
   }, [activeDialog, to_user, messages]);  // ← оба источника
+
+  function handleBeforeClose() {
+    handleCloseDialog(user?.url_id)
+    onClose()
+  }
 
   const sendMsg = async () => {
     try {
@@ -105,10 +106,19 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
       }
       wsRef.current?.send(JSON.stringify({
         type: 'request_is_new_message',
-        url_id: user?.url_id
+        url_id_curr: user?.url_id,
       }));
     }
   };
+  const handleCloseDialog = (url_id: string) => {
+    setActiveDialog('')
+    wsRef.current?.send(JSON.stringify({
+      type: 'close_dialog',
+      url_id: url_id,
+      to_url_id: toUserUrlId
+    }))
+
+  }
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -143,16 +153,17 @@ export default function WsFriendly({isOpen, onClose, to_user, isMainEntrance}: C
     <div className={styles.container}>
       <div className={styles.headerLayout}>
         {activeDialog && isMainEntrance && (
-          <button className={styles.back} onClick={() => setActiveDialog('')}><ImArrowLeft2 size={22} /></button>
+          <button className={styles.back} onClick={() => handleCloseDialog(user?.url_id)}><ImArrowLeft2 size={22}/>
+          </button>
         )}
         <span className={styles.header}>
           Chat Message {toUserData && activeDialog && `with ${toUserData.username}`}
         </span>
-        <button className={styles.closeBtn} onClick={onClose}>✕</button>
+        <button className={styles.closeBtn} onClick={() => handleBeforeClose()}>✕</button>
       </div>
       {(activeDialog || to_user) ? (
         <div className={styles.chatContainer}>
-          <Messages to_user={to_user_url_id} messages={messages}/>
+          <Messages to_user={toUserUrlId} messages={messages}/>
           <div className={styles.inputArea}>
             <input
               type="text"

@@ -8,6 +8,7 @@ import {useWsFriendly} from "../../contexts/SocketFriendly.tsx";
 export default function Navbar({isAuthenticated, user}) {
   const [isOpen, setIsOpen] = useState(false)
   const {isNewMessage} = useWsFriendly()
+  console.log('🔔 Navbar rendered, isNewMessage:', isNewMessage)
 
   return (
     <nav className={styles.menu}>

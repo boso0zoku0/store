@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useRef, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {useParams} from "react-router-dom";
 import {useAuth} from "./Auth.tsx";
 
@@ -34,6 +34,8 @@ interface TypeContext {
   setIsNewMessage: (data: boolean) => void;
   isNewMessage: boolean;
   getDialog: (from_url_id: string, to_url_id: string) => void;
+  endDialog: string;
+  setEndDialog: (data: string) => void;
   isConnected: boolean;
 }
 
@@ -46,6 +48,8 @@ export default function WSFriendlyProvider({children}) {
   const [messages, setMessages] = useState<Message[] | null>([])
   const [isNewMessage, setIsNewMessage] = useState<Boolean>()
   const [dialogs, setDialogs] = useState<Dialog[]>([])
+  const [endDialog, setEndDialog] = useState('')
+  const lastFriend = useRef('')
   const wsRef = useRef<WebSocket | null>(null);
 
 
@@ -57,7 +61,7 @@ export default function WSFriendlyProvider({children}) {
 
     const websocket = new WebSocket(`wss://clay-shop.ru/friendly/dialog?url_id=${user.url_id}`)
     websocket.onopen = () => {
-      wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
+      wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id_curr': user.url_id}))
       wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
       setIsConnected(true)
     }
@@ -65,20 +69,28 @@ export default function WSFriendlyProvider({children}) {
       const data = JSON.parse(event.data)
 
       if (data.type === 'client_msg') {
+        if (data.from_url_id !== user.url_id) {
+          wsRef.current?.send(JSON.stringify({
+            'type': 'request_is_new_message',
+            'url_id_curr': user.url_id,
+          }))
+        }
         const msg = {
           ...data,
           is_own: data.from_url_id === user?.url_id
         };
         wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
-        wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
+
         setMessages(prev => [...prev, msg]);
+
+      } else if (data.type === 'dialog_leave_friend') {
+        setEndDialog(data.url_id_friend)
 
       } else if (data.type === 'response_dialogs_history') {
         setDialogs(data.message)
 
       } else if (data.type === 'response_is_new_message') {
         setIsNewMessage(data.message)
-
       } else if (data.type === 'response_dialog_history') {
         const historyDialog = data.message.map((msg) => ({
           id: msg.id,
@@ -110,19 +122,26 @@ export default function WSFriendlyProvider({children}) {
   const sendMessage = (data: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(data));
-      console.log('📤 Отправлено:', data);
     } else {
       console.warn('⚠️ WebSocket не открыт');
     }
   };
   const getDialog = async (from_url_id: string, to_url_id: string) => {
-    console.log('📤 getDialog отправляет:', {from_url_id, to_url_id});
     wsRef.current?.send(JSON.stringify({
       type: 'request_dialog_history',
       from_url_id: from_url_id,
       to_url_id: to_url_id
     }));
+    // Юзер говорит что он в диалоге, если придут новые сообщения, чтобы они отметились как прочитанные
+    wsRef.current?.send(JSON.stringify({
+      type: 'in_dialog',
+      url_id: from_url_id,
+      to_url_id: to_url_id
+    }));
+    lastFriend.current = to_url_id
+    console.log(`to_url_id: ${to_url_id}`)
   };
+
 
   return (
     <WsFriendlyContext.Provider value={{
@@ -134,7 +153,9 @@ export default function WSFriendlyProvider({children}) {
       dialogs,
       getDialog,
       setDialogs,
-      isConnected
+      isConnected,
+      setEndDialog,
+      endDialog
     }}>
       {children}
     </WsFriendlyContext.Provider>
