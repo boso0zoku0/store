@@ -1,5 +1,5 @@
 import {useRef, useState} from "react";
-import styles from "./shoppingCartMobile.module.css";
+import styles from "../CartMobile.module.css";
 
 interface CartItemProps {
   onRemove: () => void;

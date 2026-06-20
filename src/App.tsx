@@ -2,11 +2,11 @@ import './App.css'
 import Layers from "./components/Parallax/Parallax.tsx";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css'
-import ShoppingCart from "./components/Cart/ShoppingCart.tsx";
+import Cart from "./components/Cart/Cart.tsx";
 import Navigation from './components/Navigation/Navigation.tsx'
 import Profile from "./components/Profile/Profile.tsx";
 import ProfileMobile from "./components/Profile/ProfileMobile.tsx";
-import ProductCards from "./components/ProductCard/ProductCard.tsx";
+import Products from "./components/Products/Products.tsx";
 import ModalPurchase from "./components/ModalPurchase/ModalPurchase.tsx";
 import Checkout from "./components/Checkout/Checkout.tsx";
 import {ToastContainer} from "react-toastify";
@@ -20,7 +20,7 @@ import {WsNotifyProvider} from "./contexts/SocketNotify.tsx";
 import WSFriendlyProvider from "./contexts/SocketFriendly.tsx";
 import {useMediaQuery} from 'react-responsive';
 import {useEffect, useState} from "react";
-import ShoppingCartMobile from "./components/Cart/ShoppingCartMobile.tsx";
+import CartMobile from "./components/Cart/CartMobile.tsx";
 
 
 function App() {
@@ -37,9 +37,9 @@ function App() {
                   <Route path={"/profile/:id"} element={isMobile ? <ProfileMobile/> : <Profile/>}/>
                   <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
                   <Route path="/page" element={<Layers/>}/>
-                  <Route path="/products" element={<ProductCards/>}/>
+                  <Route path="/products" element={<Products/>}/>
                   <Route path="/checkout" element={<Checkout/>}/>
-                  <Route path={"/cart"} element={isMobile ? <ShoppingCartMobile/> : <ShoppingCart/>}/>
+                  <Route path={"/cart"} element={isMobile ? <CartMobile/> : <Cart/>}/>
                   <Route path={"/nav"} element={<Navigation/>}/>
                   {/*<Route path={"/requisites"} element={<Requisites/>}/>*/}
                   <Route path={"/login"} element={<Login/>}/>

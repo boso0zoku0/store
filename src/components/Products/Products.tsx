@@ -1,13 +1,12 @@
-import styles from './ProductCard.module.css'
+import styles from './Products.module.css'
 import {useState, useEffect} from 'react';
-import type {CartItem} from "../interfaces.tsx";
+import {type CartItem, ProductStatus} from "../interfaces.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
-import ProductFilters from "../ProductFulter/Filter.tsx";
 import type FilterState from "../ProductFulter/Filter.tsx";
-import {ProductStatus} from "./interfaces.tsx"
 import {useQuery} from "@tanstack/react-query";
 import api from "../../utils/auth.tsx";
 import gsap from 'gsap';
+import {useAuth} from "../../contexts/Auth.tsx";
 
 interface FilterState {
   categories: string[];
@@ -17,10 +16,11 @@ interface FilterState {
   inStock: boolean;
 }
 
-export default function ProductCards() {
+export default function Products() {
+  const {isAuthenticated} = useAuth()
+  const [modalLogin, setModalLogin] = useState<Boolean>(false)
   const [activeProduct, setActiveProduct] = useState<CartItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isReqLogin, setIsReqLogin] = useState(false);
+  const [modalProduct, setModalProduct] = useState(false);
   const [priceFilterEnabled, setPriceFilterEnabled] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
@@ -66,14 +66,12 @@ export default function ProductCards() {
     }
   }, [products, isLoading]);
 
-  const handleAuth = async (slug: string, product_status: ProductStatus) => {
+  const handleAddProduct = async (slug: string, product_status: ProductStatus) => {
     try {
       await api.post(`/products/add/to-cart`, {slug, product_status});
-      setIsReqLogin(false);
-      window.open('/cart');
     } catch (error: any) {
       if (error.status === 401) {
-        setIsReqLogin(true);
+        setModalLogin(true);
       }
     }
   };
@@ -113,20 +111,16 @@ export default function ProductCards() {
 
   const openModal = (product: CartItem) => {
     setActiveProduct(product);
-    setModalOpen(true);
+    setModalProduct(true);
   };
 
   const closeModal = () => {
-    setModalOpen(false);
+    setModalProduct(false);
     setActiveProduct(null);
   };
 
-  const handlePriceFilterToggle = (enabled: boolean) => {
-    setPriceFilterEnabled(enabled);
-  };
-
-  if (isReqLogin) {
-    return <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)}/>;
+  if (!isAuthenticated) {
+    return <LoginModal isOpen={modalLogin} onClose={() => setModalLogin(false)}/>;
   }
 
   if (isLoading) {
@@ -199,7 +193,7 @@ export default function ProductCards() {
                   <div className={styles.productFooter}>
                     <span className={styles.productPrice}>{product.price.toLocaleString('de-DE')} ₽</span>
                     <button className="btn-buy"
-                            onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}>
+                            onClick={() => handleAddProduct(product.slug, ProductStatus.PROCESSING)}>
                       В корзину
                     </button>
                   </div>
@@ -211,7 +205,7 @@ export default function ProductCards() {
       </div>
 
       {/* Модальное окно */}
-      {modalOpen && activeProduct && (
+      {modalProduct && activeProduct && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <button className={styles.modalClose} onClick={closeModal}>×</button>
@@ -238,7 +232,7 @@ export default function ProductCards() {
                 </div>
               )}
               <button className="button"
-                      onClick={() => handleAuth(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину
+                      onClick={() => handleAddProduct(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину
               </button>
             </div>
           </div>

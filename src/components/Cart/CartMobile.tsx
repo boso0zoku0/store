@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import styles from './shoppingCartMobile.module.css';
-import {CartItem} from "./CartItem.tsx";
+import styles from './CartMobile.module.css';
+import {CartItem} from "./utils/CartItem.tsx";
 import api, {isAuthenticated} from "../../utils/auth.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
 
 
-export default function OrderList() {
+export default function CartMobile() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showLogin, setShowLogin] = useState(false);
   const [loading, setLoading] = useState(true);

@@ -19,7 +19,7 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => void;  // обновление данных
   user_role: string;
   isAuth: boolean;
-  setPurchaseData: (username: string, product_id: string, url_id: string)=>void;
+  setPurchaseData: (username: string, product_id: string, url_id: string) => void;
 }
 
 
@@ -45,7 +45,6 @@ export const AuthProvider = ({children}: { children: ReactNode }) => {
           setIsAuthenticated(false);
           setUser(null);
         }
-      } else {
       }
       setIsLoading(false);
     };
