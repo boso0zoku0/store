@@ -15,6 +15,7 @@ export default function ShoppingCart() {
   const [login, setLogin] = useState(false)
   const navigate = useNavigate();
   const {user, setPurchaseData} = useAuth()
+  console.log(`isAuth value in shop cart: ${isAuthenticated}`)
 
   useEffect(() => {
     const fetchCart = async () => {
