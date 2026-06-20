@@ -3,7 +3,7 @@ import {useNavigate, Link} from 'react-router-dom';
 import api, {setTokens} from "../../../utils/auth.tsx";
 import styles from './Registrations.module.css';
 import Stars from "../Login/Stars.tsx";
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../../contexts/Auth.tsx";
 import {TelegramLogin} from "./RegistrTelegram.tsx";
 
 

@@ -2,12 +2,12 @@ import styles from './ProductCard.module.css'
 import {useState, useEffect} from 'react';
 import type {CartItem} from "../interfaces.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
-import ProductFilters from "../ProductFulter/Filter.tsx";
 import type FilterState from "../ProductFulter/Filter.tsx";
 import {ProductStatus} from "./interfaces.tsx"
 import {useQuery} from "@tanstack/react-query";
 import api from "../../utils/auth.tsx";
 import gsap from 'gsap';
+import {useAuth} from "../../contexts/Auth.tsx";
 
 interface FilterState {
   categories: string[];
@@ -17,10 +17,11 @@ interface FilterState {
   inStock: boolean;
 }
 
-export default function ProductCards() {
+export default function Products() {
   const [activeProduct, setActiveProduct] = useState<CartItem | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isReqLogin, setIsReqLogin] = useState(false);
+  const [modalProduct, setModalProduct] = useState(false);
+  const [modalAuth, setModalAuth] = useState(false);
+  const {isAuthenticated} = useAuth()
   const [priceFilterEnabled, setPriceFilterEnabled] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
@@ -32,7 +33,7 @@ export default function ProductCards() {
   const [hoverStates, setHoverStates] = useState<Record<number, boolean>>({});
   const [imageIndices, setImageIndices] = useState<Record<number, number>>({});
 
-  const {data: products, isLoading, isFetching} = useQuery<CartItem[]>({
+  const {data: products, isLoading} = useQuery<CartItem[]>({
     queryKey: ['products', filters, priceFilterEnabled],
     queryFn: async () => {
       const filtersToSend = {...filters};
@@ -55,7 +56,6 @@ export default function ProductCards() {
     placeholderData: (previousData) => previousData,
   });
 
-  // GSAP анимация карточек при загрузке
   useEffect(() => {
     if (products && products.length > 0 && !isLoading) {
       gsap.fromTo(
@@ -66,82 +66,57 @@ export default function ProductCards() {
     }
   }, [products, isLoading]);
 
-  const handleAuth = async (slug: string, product_status: ProductStatus) => {
-    try {
+  const handleAddCart = async (slug: string, product_status: ProductStatus) => {
+    if (!isAuthenticated) {
+      setModalAuth(true)
+    } else {
       await api.post(`/products/add/to-cart`, {slug, product_status});
-      setIsReqLogin(false);
-      window.open('/cart');
-    } catch (error: any) {
-      if (error.status === 401) {
-        setIsReqLogin(true);
-      }
     }
-  };
+  }
 
+
+  // Ограничение длинны описания товара
   const truncateText = (text: string) => text.length > 50 ? `${text.slice(0, 50)}...` : text;
-
+  // Пролистывание фото товара
   const handleMouseEnter = (productId: number) => {
     setHoverStates(prev => ({...prev, [productId]: true}));
   };
-
   const handleMouseLeave = (productId: number) => {
     setHoverStates(prev => ({...prev, [productId]: false}));
     setImageIndices(prev => ({...prev, [productId]: 0}));
   };
-
   const handlePrevImage = (e: React.MouseEvent, productId: number, photosLength: number) => {
     e.stopPropagation();
-
     setImageIndices(prev => {
-      const current = prev[productId] ?? 0;  // 👈 значение по умолчанию 0
+      const current = prev[productId] ?? 0;
       const next = (current - 1 + photosLength) % photosLength;
-      console.log(`Назад: текущий ${current} → новый ${next}`);
       return {...prev, [productId]: next};
     });
   };
-
   const handleNextImage = (e: React.MouseEvent, productId: number, photosLength: number) => {
     e.stopPropagation();
 
     setImageIndices(prev => {
-      const current = prev[productId] ?? 0;  // 👈 значение по умолчанию 0
+      const current = prev[productId] ?? 0;
       const next = (current + 1) % photosLength;
       return {...prev, [productId]: next};
     });
   };
 
 
-  const openModal = (product: CartItem) => {
+  const openProductModal = (product: CartItem) => {
     setActiveProduct(product);
-    setModalOpen(true);
+    setModalProduct(true);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
+  const closeProductModal = () => {
+    setModalProduct(false);
     setActiveProduct(null);
   };
-
-  const handlePriceFilterToggle = (enabled: boolean) => {
-    setPriceFilterEnabled(enabled);
-  };
-
-  if (isReqLogin) {
-    return <LoginModal isOpen={isReqLogin} onClose={() => setIsReqLogin(false)}/>;
-  }
-
-  if (isLoading) {
-    return <div className={styles.loader}>Загрузка товаров...</div>;
-  }
 
   return (
     <>
       <div className={styles.catalogLayout}>
-        <ProductFilters
-          onFilterChange={setFilters}
-          priceFilterEnabled={priceFilterEnabled}
-          onPriceFilterToggle={handlePriceFilterToggle}
-        />
-
         <div className={styles.productsGrid}>
           {products?.map((product) => {
             const isHovering = hoverStates[product.id] || false;
@@ -182,9 +157,8 @@ export default function ProductCards() {
                     src={photos[currentIndex] ? `/api/static/media/${photos[currentIndex]}` : '/placeholder.jpg'}
                     alt={product.name}
                     loading="lazy"
-                    onClick={() => openModal(product)}
+                    onClick={() => openProductModal(product)}
                   />
-
                   {isHovering && photos.length > 1 && (
                     <div>
                       {photos.map((_, idx) => (
@@ -195,14 +169,13 @@ export default function ProductCards() {
                     </div>
                   )}
                 </div>
-
                 <div className={styles.productInfo}>
                   <h3 className={styles.productTitle}>{truncateText(product.name)}</h3>
                   <p className={styles.productDescription}>{product.description?.type || ''}</p>
                   <div className={styles.productFooter}>
                     <span className={styles.productPrice}>{product.price.toLocaleString('de-DE')} ₽</span>
                     <button className="btn-buy"
-                            onClick={() => handleAuth(product.slug, ProductStatus.PROCESSING)}>
+                            onClick={() => handleAddCart(product.slug, ProductStatus.PROCESSING)}>
                       В корзину
                     </button>
                   </div>
@@ -213,11 +186,11 @@ export default function ProductCards() {
         </div>
       </div>
 
-      {/* Модальное окно */}
-      {modalOpen && activeProduct && (
-        <div className={styles.modalOverlay} onClick={closeModal}>
+      {/* Модалка товара */}
+      {modalProduct && activeProduct && (
+        <div className={styles.modalOverlay} onClick={closeProductModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={closeModal}>×</button>
+            <button className={styles.modalClose} onClick={closeProductModal}>×</button>
             <div className={styles.productDetails}>
               <h2>{activeProduct.name}</h2>
               <p className={styles.productPrice}>{activeProduct.price.toLocaleString('de-DE')} ₽</p>
@@ -241,11 +214,14 @@ export default function ProductCards() {
                 </div>
               )}
               <button className="button"
-                      onClick={() => handleAuth(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину
+                      onClick={() => handleAddCart(activeProduct.slug, ProductStatus.PROCESSING)}>Добавить в корзину
               </button>
             </div>
           </div>
         </div>
+      )}
+      {modalAuth && (
+        <LoginModal isOpen={modalAuth} onClose={() => setModalAuth(false)}/>
       )}
     </>
   );

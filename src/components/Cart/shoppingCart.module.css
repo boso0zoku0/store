@@ -1,6 +1,6 @@
 /* Основной контейнер корзины */
 .cartContainer {
-  max-width: 1200px;
+  width: 50%;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -8,10 +8,15 @@
 /* Сетка контента */
 .cartContent {
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: 1fr;
   gap: 30px;
 }
+@media (min-width: 768px) {
+  .cartContent {
+    grid-template-columns: 1fr 380px;
+  }
 
+}
 /* Список товаров */
 .cartItems {
   background: var(--bg);
@@ -252,7 +257,6 @@
     position: relative;
   }
 }
-
 
 
 /* анимация по клику на добавление товара */

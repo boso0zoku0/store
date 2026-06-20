@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import styles from './Main.module.css';
 
-export default function Hero() {
+export default function Main() {
   const heroRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

@@ -1,5 +1,5 @@
 import styles from "./WebSocketFriendly.module.css";
-import type {Message} from "../../../contexts/SocketFriendlyManager.tsx"
+import type {Message} from "../../../contexts/SocketFriendly.tsx"
 import {useCallback, useEffect, useRef} from "react";
 
 interface MessagesProps {
@@ -10,7 +10,7 @@ interface MessagesProps {
 export default function Messages({to_user, messages}: MessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+    messagesEndRef.current?.scrollIntoView();
     console.log(`mess: ${messages}`)
   }, []);
 
@@ -22,9 +22,7 @@ export default function Messages({to_user, messages}: MessagesProps) {
   if (!to_user) {
     return null
   }
-  useEffect(() => {
-    console.log(`messages: ${messages}`)
-  }, []);
+
   return (
     <div className={styles.messages}>
       {messages.map((msg, index) => (
@@ -32,7 +30,7 @@ export default function Messages({to_user, messages}: MessagesProps) {
           key={index}
           className={`${styles.message} ${msg.is_own ? styles.ownMessage : styles.otherMessage}`}
         >
-          <span className={styles.messageUsername}>{msg.is_own ? 'Вы:' : msg.sender}</span>
+          <span className={styles.messageUsername}>{msg.is_own ? 'Вы: ' : `${msg.sender}: `}</span>
           <span className={styles.messageText}>{msg.message}</span>
         </div>
       ))}

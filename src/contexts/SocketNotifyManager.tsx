@@ -1,5 +1,5 @@
 import {createContext, useContext, useEffect, useRef, ReactNode, useState, MutableRefObject} from 'react';
-import { useAuth } from './AuthContexts.tsx';
+import {useAuth} from './AuthContexts.tsx';
 
 interface WebSocketContextType {
   wsRef: React.MutableRefObject<WebSocket | null>;
@@ -7,19 +7,21 @@ interface WebSocketContextType {
   isConnected: boolean;
   message: Message
 }
+
 interface Message {
   username: string;
   url_id: string;
   product_name: string;
   type?: string;
 }
+
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
-export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isAuthenticated } = useAuth();
+export const WsNotifyProvider = ({children}: { children: ReactNode }) => {
+  const {user, isAuthenticated} = useAuth();
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const hasSentRef = useRef(false);
+  const [hasSentRef, setSentRef] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
 
     websocket.onopen = () => {
       setIsConnected(true);
-      if (user.product_name && !hasSentRef.current) {
+      if (user.product_name && !hasSentRef) {
         const message = {
           type: "notify_manager",
           username: user.name,
@@ -43,7 +45,7 @@ export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
           product_name: user.product_name,
         };
         websocket.send(JSON.stringify(message));
-        hasSentRef.current = true;
+        setSentRef(true)
       }
     };
 
@@ -80,7 +82,7 @@ export const WsNotifyProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <WebSocketContext.Provider value={{ wsRef, sendMessage, message, isConnected }}>
+    <WebSocketContext.Provider value={{wsRef, sendMessage, message, isConnected}}>
       {children}
     </WebSocketContext.Provider>
   );

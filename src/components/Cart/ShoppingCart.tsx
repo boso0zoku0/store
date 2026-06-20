@@ -5,7 +5,7 @@ import {showToast} from "../ToastCheckout/Toast.tsx";
 import type {CartItem} from "./interfaces.tsx";
 import api, {isAuthenticated} from "../../utils/auth.tsx";
 import LoginModal from "../Auth/Modal/Login.tsx";
-import {useAuth} from "../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../contexts/Auth.tsx";
 
 
 export default function ShoppingCart() {
@@ -15,6 +15,7 @@ export default function ShoppingCart() {
   const [login, setLogin] = useState(false)
   const navigate = useNavigate();
   const {user, setPurchaseData} = useAuth()
+  console.log(`isAuth value in shop cart: ${isAuthenticated}`)
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -24,8 +25,6 @@ export default function ShoppingCart() {
           console.log(response.data)
           setCartItems(response.data);
           setLogin(false)
-
-
         } else {
           setLogin(true)
           setCartItems([]);

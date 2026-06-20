@@ -1,9 +1,9 @@
 .catalogLayout {
   display: flex;
   gap: 2rem;
-  width: 1500px;
+  width: 80%;
   max-width: 100%;
-  margin: 2rem auto;
+  margin: 5rem auto;
   padding: 0 1rem;
   align-items: start;
 }
@@ -12,7 +12,17 @@
   flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .catalogLayout {
+    flex-direction: column;
+    margin: 2rem auto;
+  }
+  .productsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
 }
 
 .productCard {
@@ -331,12 +341,3 @@
   }
 }
 
-@media (max-width: 768px) {
-  .catalogLayout {
-    flex-direction: column;
-  }
-  .productsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
-}

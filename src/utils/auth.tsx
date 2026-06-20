@@ -129,6 +129,7 @@ api.interceptors.response.use(
           });
 
         const {access_token, refresh_token} = response.data;
+        alert(`бэк ответил acc: ${access_token} ; ref: ${refresh_token}`)
 
         // Сохраняем новые токены
         localStorage.setItem('access_token', access_token);
@@ -148,7 +149,6 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
         return Promise.reject(refreshError);
 
       } finally {

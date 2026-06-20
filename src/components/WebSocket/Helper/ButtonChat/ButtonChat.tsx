@@ -1,17 +1,18 @@
 // components/ChatButton/ChatButton.tsx
 import {useState} from 'react';
 import styles from './ButtonChat.module.css';
-import {useAuth} from "../../../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../../../contexts/Auth.tsx";
 import ChatClient from "../Client.tsx";
 import ChatOperator from "../Operator.tsx";
+import {useWsFriendly} from "../../../../contexts/SocketFriendly.tsx";
 
 export default function ChatButton() {
   const {user, isLoading} = useAuth();
+  const {} = useWsFriendly()
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   if (isLoading || onclose) return null;
-  if (!user?.user_role) return null;
-  const isOperator = user.user_role === 'assistant'
+  if (!user?.url_id) return null;
 
   const buttonStyle = user.user_role === 'assistant'
     ? styles.assistantChat
@@ -47,7 +48,7 @@ export default function ChatButton() {
         </svg>
       </button>
       {isChatOpen && (
-        isOperator
+        user.user_role === 'assistant'
           ? <ChatOperator operatorName={user.name} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}/>
           : <ChatClient clientName={user.name} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}/>
       )}

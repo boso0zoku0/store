@@ -1,36 +1,17 @@
-/* ClientMessageBubble.css */
-
-/* ===== ОСНОВНЫЕ КОНТЕЙНЕРЫ ===== */
 .message-wrapper {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   margin-bottom: 12px;
+  gap: 8px;
 }
 
-.message-wrapper.client {
+.message-wrapper.outgoing {
   justify-content: flex-end;
 }
 
-.message-wrapper.operator {
+.message-wrapper.incoming {
   justify-content: flex-start;
-}
-
-.message-wrapper.bot {
-  justify-content: center;
-}
-
-/* Системное сообщение */
-.message-wrapper.system {
-  justify-content: center;
-  margin: 8px 0;
-}
-
-/* Ограничение ширины самого сообщения */
-.message-inner {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  max-width: 70%;
 }
 
 .message-wrapper.media-outgoing {
@@ -41,64 +22,27 @@
   justify-content: flex-start;
 }
 
-
-/* ===== ИКОНКИ ===== */
-.icon-left {
-  padding: 8px;
-  border-radius: 9999px;
-  margin-bottom: 4px;
+.icon {
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-left.operator {
-  background-color: #f3e8ff;
-}
-
-.icon-left.bot {
-  background-color: #d1fae5;
-}
-
-.icon-left.system {
-  background-color: #f9fafb;
-}
-
-.icon-right {
-  background-color: #dbeafe;
-  padding: 8px;
+  margin: 8px;
+  padding-left: 4px;
   border-radius: 9999px;
-  margin-bottom: 4px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Размеры иконок */
 .icon-size-md {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .icon-size-sm {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
-.icon-size-lg {
-  width: 24px;
-  height: 24px;
-}
 
-/* Цвета иконок */
 .icon-purple {
   color: #9333ea;
-}
-
-.icon-emerald {
-  color: #047857;
 }
 
 .icon-gray {
@@ -109,7 +53,6 @@
   color: #1d4ed8;
 }
 
-/* ===== ИМЯ ОТПРАВИТЕЛЯ ===== */
 .sender-name {
   font-size: 12px;
   color: #6b7280;
@@ -125,20 +68,11 @@
   font-size: 15px;
 }
 
-
 /* ===== ТЕКСТ СООБЩЕНИЯ ===== */
 .message-text {
   word-break: break-word;
   font-size: 15px;
-}
-
-.message-text.white {
   color: white;
-  font-size: 15px;
-}
-
-.message-text.gray {
-  color: #374151;
 }
 
 /* ===== КНОПКА В СООБЩЕНИИ ===== */
@@ -161,95 +95,61 @@
   margin-top: 6px;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
   opacity: 0.75;
-}
-
-.message-time.client {
   color: white;
 }
 
-.message-time.operator {
-  color: white;
-}
-
-.message-time.bot {
-  color: #d1fae5;
-}
-
-.message-time.system {
-  color: #6b7280;
-}
-
-.message-time.media-outgoing {
-  color: #dbeafe;
-}
-
-.message-time.media-incoming {
-  color: #f3e8ff;
-}
-
-
-
-
-
-
-/* ===== СИСТЕМНОЕ СООБЩЕНИЕ (ЦЕНТРИРОВАННОЕ) ===== */
-.system-message-container {
+.bot-message {
   display: flex;
-  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 100%;
 }
 
-.system-message-bubble {
-  background-color: #93c5fd;
-  color: white;
+.icon-bot {
+  flex-shrink: 0;
+  margin: 8px;
+  width: 24px;
+  height: 24px;
+  color: #8b5cf6;
+}
+
+.bot-message-text {
+  background: #93c5fd;
   padding: 8px 16px;
-  border-radius: 9999px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  border: 1px solid #e5e7eb;
-  max-width: 80%;
+  border-radius: 18px;
+  color: white;
+  font-size: 14px;
+}
+
+
+.media-content {
   display: flex;
   align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
   gap: 8px;
 }
 
-.system-message-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.system-message-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  margin-top: 2px;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-/* ===== МЕДИА КОНТЕНТ ===== */
-.media-content {
-  margin-bottom: 8px;
-}
-
 .media-image {
-  max-width: 100%;
-  border-radius: 8px;
-  max-height: 256px;
-  object-fit: contain;
+  max-width: 100%; /* чтобы не вылезало за пределы */
+  max-height: 300px; /* ограничить высоту */
+  width: auto; /* сохранить пропорции */
+  height: auto; /* сохранить пропорции */
+  border-radius: 12px; /* скругление углов (опционально) */
+  object-fit: contain; /* чтобы фото не обрезалось */
+  cursor: pointer; /* если захотите открыть на весь экран */
 }
 
 .media-video {
-  max-width: 100%;
-  border-radius: 8px;
-  max-height: 256px;
-}
-
-.media-link {
-  color: white;
-  text-decoration: underline;
-}
-
-.media-link:hover {
-  text-decoration: none;
+  max-width: 100%; /* чтобы не вылезало за пределы */
+  max-height: 300px; /* ограничить высоту (как у фото) */
+  width: auto; /* сохранить пропорции */
+  height: auto; /* сохранить пропорции */
+  border-radius: 12px; /* скругление углов */
+  object-fit: contain; /* видео не обрезается */
+  cursor: pointer; /* клик для увеличения */
+  background: #000; /* чёрный фон для видео */
 }

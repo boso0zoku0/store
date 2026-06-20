@@ -8,7 +8,7 @@ import {format} from 'date-fns';
 import {ru} from 'date-fns/locale';
 import api from "../../utils/auth.tsx";
 import type {GeneralData} from "./interfaces.tsx";
-import {useAuth} from "../../contexts/AuthContexts.tsx";
+import {useAuth} from "../../contexts/Auth.tsx";
 import WsFriendly from "../WebSocket/Friendly/Users.tsx";
 
 export default function Profile() {
@@ -18,7 +18,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState<'orders' | 'favorites' | 'settings'>('orders');
   const [isOpenChat, setIsOpenChat] = useState(false)
 
-  const isOwn = user?.url_id === id;
+  const isOwnProfile = user?.url_id === id;
 
   const {data, isLoading} = useQuery<GeneralData>({
     queryKey: ['userProfile'],
@@ -31,6 +31,8 @@ export default function Profile() {
     staleTime: 1000 * 60 * 10,
     gcTime: 1000 * 60 * 30,
   });
+  console.log('URL param id:', id);
+  console.log('Current user url_id:', user?.url_id);
 
 
   const formatDate = (dateString?: string) => {
@@ -44,7 +46,7 @@ export default function Profile() {
   };
 
   const handleOpenChat = () => {
-     setIsOpenChat(!isOpenChat)
+    setIsOpenChat(!isOpenChat)
   };
 
   if (isLoading) {
@@ -78,7 +80,7 @@ export default function Profile() {
                   <Calendar size={16}/>
                   <span>С нами с {formatDate(data?.date_registration)}</span>
                 </div>
-                {isOwn && (
+                {isOwnProfile && (
                   <>
                     <div className={styles.stat}>
                       <Package size={16}/>
@@ -92,7 +94,7 @@ export default function Profile() {
               </div>
             </div>
           </div>
-          {!isOwn && (
+          {!isOwnProfile && (
             <div className={styles.actions} onClick={handleOpenChat}>
               <button className={styles.contactBtn}>
                 <MessageCircle size={18}/>
@@ -114,107 +116,147 @@ export default function Profile() {
             <Package size={18}/>
             <span>История покупок</span>
           </button>
-          <button
-            className={`${styles.tab} ${activeTab === 'favorites' ? styles.active : ''}`}
-            onClick={() => setActiveTab('favorites')}
-          >
-            <Heart size={18}/>
-            <span>Избранное</span>
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === 'settings' ? styles.active : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            <Settings size={18}/>
-            <span>Настройки</span>
-          </button>
+          {isOwnProfile && (
+            <>
+              <button
+                className={`${styles.tab} ${activeTab === 'favorites' ? styles.active : ''}`}
+                onClick={() => setActiveTab('favorites')}
+              >
+                <Heart size={18}/>
+                <span>Избранное</span>
+              </button>
+              <button
+                className={`${styles.tab} ${activeTab === 'settings' ? styles.active : ''}`}
+                onClick={() => setActiveTab('settings')}
+              >
+                <Settings size={18}/>
+                <span>Настройки</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Контент */}
         <div className={styles.tabContent}>
-          {activeTab === 'orders' && (
-            <div className={styles.ordersList}>
-              {data?.total_price === 0 ? (
-                <div className={styles.emptyState}>
-                  <div className={styles.emptyClayIcon}/>
-                  <p>У вас пока нет заказов</p>
-                  <button onClick={() => navigate('/products')} className={styles.shopBtn}>
-                    Перейти в каталог
-                  </button>
+          {isOwnProfile ? (
+            <>
+              {activeTab === 'orders' && (
+                <div className={styles.ordersList}>
+                  {data?.total_price === 0 ? (
+                    <div className={styles.emptyState}>
+                      <div className={styles.emptyClayIcon}/>
+                      <p>У вас пока нет заказов</p>
+                      <button onClick={() => navigate('/products')} className={styles.shopBtn}>
+                        Перейти в каталог
+                      </button>
+                    </div>
+                  ) : (
+                    data?.products_info?.map((order, index) => (
+                      <div key={`${order.id}-${index}`} className={styles.orderCard}>
+                        <div className={styles.orderHeader}>
+                          <div className={styles.orderInfo}>
+                    <span className={styles.orderDate}>
+                      <Clock size={14}/>
+                      {formatDate(order.created_at)}
+                    </span>
+                            <span className={`${styles.orderStatus} ${styles[order.status]}`}>
+                      {order.status === 'completed' && 'Доставлен'}
+                              {order.status === 'moving' && 'В пути'}
+                              {order.status === 'processing' && 'Обрабатывается'}
+                              {order.status === 'cancelled' && 'Отменен'}
+                              {order.status === 'none' && 'В очереди'}
+                    </span>
+                          </div>
+                          <span className={styles.orderTotal}>
+                    {(order.price ?? 0).toLocaleString()} ₽
+                  </span>
+                        </div>
+                        <div className={styles.orderItem}>
+                          <img src={`/api/static/media/${order.photo[0]}`} alt={order.short_name}
+                               className={styles.orderImage}/>
+                          <div className={styles.orderDetails}>
+                            <h4>{order.short_name}</h4>
+                            <p>{order.quantity} шт × {order.price.toLocaleString()} ₽</p>
+                          </div>
+                        </div>
+                        <button className={styles.reorderBtn}>Заказать снова</button>
+                      </div>
+                    ))
+                  )}
                 </div>
-              ) : (
-                data?.products_info?.map((order, index) => (
-                  <div key={`${order.id}-${index}`} className={styles.orderCard}>
-                    <div className={styles.orderHeader}>
-                      <div className={styles.orderInfo}>
-                        <span className={styles.orderDate}>
-                          <Clock size={14}/>
-                          {formatDate(order.created_at)}
-                        </span>
-                        <span className={`${styles.orderStatus} ${styles[order.status]}`}>
-                          {order.status === 'completed' && 'Доставлен'}
-                          {order.status === 'moving' && 'В пути'}
-                          {order.status === 'processing' && 'Обрабатывается'}
-                          {order.status === 'cancelled' && 'Отменен'}
-                          {order.status === 'none' && 'В очереди'}
-                        </span>
-                      </div>
-
-                      <span className={styles.orderTotal}>
-                        {(order.price ?? 0).toLocaleString()} ₽
-                      </span>
-                    </div>
-                    <div className={styles.orderItem}>
-                      <img src={`/api/static/media/${order.photo[0]}`} alt={order.short_name}
-                           className={styles.orderImage}/>
-                      <div className={styles.orderDetails}>
-                        <h4>{order.short_name}</h4>
-                        <p>{order.quantity} шт × {order.price.toLocaleString()} ₽</p>
-                      </div>
-                    </div>
-
-                    <button className={styles.reorderBtn}>Заказать снова</button>
-                  </div>
-                ))
               )}
-            </div>
-          )}
 
-          {activeTab === 'favorites' && (
-            <div className={styles.favoritesGrid}>
-              <div className={styles.emptyState}>
-                <Heart size={48} strokeWidth={1}/>
-                <p>Избранное пусто</p>
-                <button onClick={() => navigate('/products')} className={styles.shopBtn}>
-                  Добавить товары
-                </button>
-              </div>
-            </div>
-          )}
+              {activeTab === 'favorites' && (
+                <div className={styles.favoritesGrid}>
+                  <div className={styles.emptyState}>
+                    <Heart size={48} strokeWidth={1}/>
+                    <p>Избранное пусто</p>
+                    <button onClick={() => navigate('/products')} className={styles.shopBtn}>
+                      Добавить товары
+                    </button>
+                  </div>
+                </div>
+              )}
 
-          {activeTab === 'settings' && (
-            <div className={styles.settingsForm}>
-              <h3>Контактная информация</h3>
-              <div className={styles.formGroup}>
-                <label>Email</label>
-                <div className={styles.inputWithIcon}>
-                  <Mail size={18}/>
-                  <input type="email" value={data?.email || 'Не указан'} readOnly/>
+              {activeTab === 'settings' && (
+                <div className={styles.settingsForm}>
+                  <h3>Контактная информация</h3>
+                  <div className={styles.formGroup}>
+                    <label>Email</label>
+                    <div className={styles.inputWithIcon}>
+                      <Mail size={18}/>
+                      <input type="email" value={data?.email || 'Не указан'} readOnly/>
+                    </div>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Телефон</label>
+                    <div className={styles.inputWithIcon}>
+                      <Phone size={18}/>
+                      <input type="tel" value={data?.phone || 'Не указан'} readOnly/>
+                    </div>
+                  </div>
+                  <button className={styles.editBtn}>Редактировать профиль</button>
                 </div>
-              </div>
-              <div className={styles.formGroup}>
-                <label>Телефон</label>
-                <div className={styles.inputWithIcon}>
-                  <Phone size={18}/>
-                  <input type="tel" value={data?.phone || 'Не указан'} readOnly/>
+              )}
+            </>
+          ) : (
+            <>
+              {activeTab === 'orders' && (
+                <div className={styles.ordersList}>
+                  {data?.total_price === 0 ? (
+                    <div className={styles.emptyState}>
+                      <div className={styles.emptyClayIcon}/>
+                      <p>У пользователя нет заказов</p>
+                    </div>
+                  ) : (
+                    data?.products_info?.map((order, index) => (
+                      <div key={`${order.id}-${index}`} className={styles.orderCard}>
+                        <div className={styles.orderHeader}>
+                          <div className={styles.orderInfo}>
+                            <span className={styles.orderDate}>
+                              <Clock size={14}/>
+                              {formatDate(order.created_at)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className={styles.orderItem}>
+                          <img src={`/api/static/media/${order.photo[0]}`} alt={order.short_name}
+                               className={styles.orderImage}/>
+                          <div className={styles.orderDetails}>
+                            <h4>{order.short_name}</h4>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
-              </div>
-              <button className={styles.editBtn}>Редактировать профиль</button>
-            </div>
+              )}
+            </>
           )}
         </div>
+
       </div>
-      {isOpenChat && id &&(
+      {isOpenChat && id && (
         <WsFriendly isOpen={isOpenChat} onClose={() => setIsOpenChat(false)} to_user={id}/>
       )}
     </div>

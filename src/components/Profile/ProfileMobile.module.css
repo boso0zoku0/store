@@ -1,0 +1,115 @@
+.flexContainer {
+  display: flex;
+  flex-direction: column; /* вертикальное расположение */
+  align-items: center; /* горизонтальный центр */
+  justify-content: flex-start; /* прижимаем к верху */
+  width: 100%;
+  height: 100vh;
+  background-color: var(--background-dark);
+  padding-top: 80px; /* высота навбара 60px сверху */
+}
+
+.avatarSettings {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.avatar {
+  width: 6em;
+  height: 6em;
+  border-radius: 30%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(160, 160, 160, 0.93);
+}
+
+.setting {
+  position: absolute;
+  right: -70%;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.user {
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #d1c2ac;
+  text-align: center;
+}
+
+.layoutBtns {
+  display: flex;
+  gap: 10%;
+  margin-top: 5%;
+}
+
+.layoutBtnH {
+  display: flex;
+  flex: 1;
+}
+
+.layoutBtnF {
+  display: flex;
+  flex: 1;
+}
+
+
+.containerContentBtnH {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 90%;
+  height: 20%;
+  margin-top: 5%;
+  gap: 5%;
+  padding: 15px;
+  border: 1px solid #3d4963;
+  border-radius: 30px;
+
+}
+
+.layoutColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerBtnH {
+}
+
+.time {
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+}
+
+.productImg {
+  width: 4em;
+  height: 4em;
+  border-radius: 30%;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(150, 143, 53, 0.8);
+}
+
+
+.contentProducts:active,
+.contentFavoriteProducts:active {
+  transform: scale(0.97);
+}
+
+.infoOrders {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 90%;
+  height: 10%;
+  margin-top: 5%;
+  padding: 15px;
+  border: 2px solid #3d4963;
+  border-radius: 30px;
+}

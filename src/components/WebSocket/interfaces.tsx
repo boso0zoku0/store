@@ -1,11 +1,16 @@
+// В некоторых ?: полях, такой знак потому что не все типы ответов с бэка по websocket возвращают этот набор данных
 export interface ClientMessage {
   id: string;
   message: string;
-  username: string;
-  timestamp: Date;
+  operator: string;
+  client?: string;
+  from_user_id?: string;
+  to_user_id?: string;
+  is_resolved?: string;
+  created_at: Date;
   isOwn: boolean;
   isButton?: boolean;
-  type?: string; // 'system', 'bot', 'OperatorHelper', 'client', 'media'
+  type: string;
   file_url?: string;
   file_name?: string;
   file_size?: string;
@@ -15,14 +20,8 @@ export interface ClientMessage {
 export interface ClientPanelProps {
   isOpen: boolean;
   clientName: string;
-  onClose: boolean
+  onClose: () => void;
 }
-
-
-
-
-
-
 
 
 export interface OperatorMessage {

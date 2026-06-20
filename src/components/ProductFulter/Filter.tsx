@@ -27,11 +27,8 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
     volume: [],
     inStock: true,
   });
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const handleTogglePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
     onPriceFilterToggle(e.target.checked);
-    console.log(`диапазон: ${filters.priceRange[0]}`)
-    console.log(`диапазон: ${filters.priceRange[1]}`)
   }
   const categories = ['Тарелки', 'Кружки', 'Пиалы', 'Сервизы', 'Вазы'];
   const colors = ['Терракотовый', 'Коричневый', 'Бежевый', 'Белый', 'Чёрный'];
@@ -86,8 +83,6 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
     setFilters(newFilters);
     onFilterChange(newFilters);
 
-    console.log(`newrange: [${newRange[0]}, ${newRange[1]}]`);
-    console.log('newfilters:', newFilters);
   };
 
   const resetFilters = () => {
@@ -104,23 +99,15 @@ export default function ProductFilters({onFilterChange, priceFilterEnabled, onPr
 
   return (
     <>
-      {/* Мобильная кнопка */}
-      <button
-        className={styles.mobileFilterButton}
-        onClick={() => setIsMobileOpen(true)}
-      >
-        🔍
-      </button>
 
       {/* Оверлей */}
       <div
-        className={`${styles.filterOverlay} ${isMobileOpen ? styles.visible : ''}`}
-        onClick={() => setIsMobileOpen(false)}
+        className={styles.filterOverlay}
       />
 
       {/* Панель фильтров */}
-      <aside className={`${styles.filtersPanel} ${isMobileOpen ? styles.open : ''}`}>
-        <div className={styles.header} onClick={() => setIsMobileOpen(!isMobileOpen)}>
+      <aside className={styles.filtersPanel}>
+        <div className={styles.header}>
           <h3 className={styles.title}>
             <SlidersHorizontal size={20} strokeWidth={1.5}/>
             Фильтры

@@ -2,8 +2,8 @@
 import {motion, AnimatePresence} from 'motion/react';
 import {useState, useEffect, useRef} from 'react';
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "../../../contexts/AuthContexts.tsx";
-import {useWsNotify} from "../../../contexts/SocketNotifyManager.tsx";
+import {useAuth} from "../../../contexts/Auth.tsx";
+import {useWsNotify} from "../../../contexts/SocketNotify.tsx";
 
 interface FloatingNotificationProps {
   username: string;
@@ -15,7 +15,7 @@ interface FloatingNotificationProps {
 // Плавающая нотификация
 const FloatingNotification = ({username, url_id, product_name, onClose}: FloatingNotificationProps) => {
   // Случайное смещение по X (влево/вправо)
-  const randomX = (Math.random() - 0.5) * 100; // -50px до 50px
+  const randomX = (Math.random() - 0.5) * 50; // -50px до 50px
   const randomRotate = (Math.random() - 0.5) * 30; // -15deg до 15deg
   return (
     <motion.div
@@ -43,26 +43,28 @@ const FloatingNotification = ({username, url_id, product_name, onClose}: Floatin
       onClick={onClose}
       style={{
         position: 'fixed',
-        bottom: 100,
-        right: 20,
+        bottom: 20,
+        right: 17,
         cursor: 'pointer',
         background: 'linear-gradient(135deg, #2b241b, #4a3a2e)',
         color: 'white',
         padding: '8px 16px',
         borderRadius: '40px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-        fontSize: '14px',
-        fontWeight: 500,
+        fontSize: '11px',
+        fontWeight: 300,
         whiteSpace: 'nowrap',
         fontFamily: 'system-ui, sans-serif',
         backdropFilter: 'blur(8px)',
         border: '1px solid rgba(255,215,140,0.3)',
         zIndex: 1000,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        textOverflow: 'ellipsis'
+
       }}
     >
-      <span style={{marginRight: '8px', fontSize: '16px'}}>🎈</span>
-      {username} купил(а) {product_name} с адресом {url_id}!
+      <span style={{marginRight: '8px', fontSize: '16px'}}>🎉</span>
+      {username} купил(а) {product_name}!
     </motion.div>
   );
 };

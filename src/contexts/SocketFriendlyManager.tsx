@@ -9,7 +9,6 @@ export interface Message {
   message: string;
   created_at: string;
   is_own?: boolean;
-
   from_url_id?: string;
   to_url_id?: string;
   type: string;
@@ -32,10 +31,11 @@ interface TypeContext {
   setDialogs: (data: any) => void;
   messages: Message[];
   dialogs: Dialog[];
+  setIsNewMessage: (data: boolean) => void;
+  isNewMessage: boolean;
   getDialog: (from_url_id: string, to_url_id: string) => void;
   isConnected: boolean;
 }
-
 
 const WsFriendlyContext = createContext<TypeContext | null>(null)
 
@@ -44,6 +44,7 @@ export default function WSFriendlyProvider({children}) {
   const {url_id} = useParams()
   const [isConnected, setIsConnected] = useState(false)
   const [messages, setMessages] = useState<Message[] | null>([])
+  const [isNewMessage, setIsNewMessage] = useState<Boolean>()
   const [dialogs, setDialogs] = useState<Dialog[]>([])
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -56,30 +57,37 @@ export default function WSFriendlyProvider({children}) {
 
     const websocket = new WebSocket(`wss://clay-shop.ru/friendly/dialog?url_id=${user.url_id}`)
     websocket.onopen = () => {
+      wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
       wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
       setIsConnected(true)
     }
     websocket.onmessage = (event) => {
       const data = JSON.parse(event.data)
+
       if (data.type === 'client_msg') {
         const msg = {
           ...data,
           is_own: data.from_url_id === user?.url_id
         };
+        wsRef.current?.send(JSON.stringify({'type': 'request_dialogs_history', 'url_id': user.url_id}))
+        wsRef.current?.send(JSON.stringify({'type': 'request_is_new_message', 'url_id': user.url_id}))
         setMessages(prev => [...prev, msg]);
 
       } else if (data.type === 'response_dialogs_history') {
         setDialogs(data.message)
 
+      } else if (data.type === 'response_is_new_message') {
+        setIsNewMessage(data.message)
+
       } else if (data.type === 'response_dialog_history') {
-          const historyDialog = data.message.map((msg) => ({
-            id: msg.id,
-            sender: msg.sender,
-            recipient: msg.recipient,
-            message: msg.message,
-            is_own: msg.is_own,
-          }))
-          setMessages(historyDialog)
+        const historyDialog = data.message.map((msg) => ({
+          id: msg.id,
+          sender: msg.sender,
+          recipient: msg.recipient,
+          message: msg.message,
+          is_own: msg.is_own,
+        }))
+        setMessages(historyDialog)
       }
     }
     websocket.onerror = (error) => {
@@ -91,6 +99,12 @@ export default function WSFriendlyProvider({children}) {
       console.log('WebSocket Friendly отключен но продолжает жить');
     };
     wsRef.current = websocket
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
 
   }, [url_id, isAuthenticated]);
   const sendMessage = (data: any) => {
@@ -101,8 +115,8 @@ export default function WSFriendlyProvider({children}) {
       console.warn('⚠️ WebSocket не открыт');
     }
   };
-  const getDialog = (from_url_id: string, to_url_id: string) => {
-    console.log('📤 getDialog отправляет:', {from_url_id, to_url_id});  // ← добавить
+  const getDialog = async (from_url_id: string, to_url_id: string) => {
+    console.log('📤 getDialog отправляет:', {from_url_id, to_url_id});
     wsRef.current?.send(JSON.stringify({
       type: 'request_dialog_history',
       from_url_id: from_url_id,
@@ -111,7 +125,17 @@ export default function WSFriendlyProvider({children}) {
   };
 
   return (
-    <WsFriendlyContext.Provider value={{wsRef, messages, sendMessage, dialogs, getDialog, setDialogs, isConnected}}>
+    <WsFriendlyContext.Provider value={{
+      wsRef,
+      isNewMessage,
+      setIsNewMessage,
+      messages,
+      sendMessage,
+      dialogs,
+      getDialog,
+      setDialogs,
+      isConnected
+    }}>
       {children}
     </WsFriendlyContext.Provider>
   );

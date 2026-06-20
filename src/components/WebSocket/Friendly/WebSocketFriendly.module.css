@@ -1,17 +1,24 @@
 .container {
-  position: fixed;
-  top: 40px;
-  right: 20px;
-  width: 450px;
-  max-width: 100vw;
-  height: 400px;
-  max-height: 80vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--base-bg);  /* базовый цвет */
+  position: fixed;
+  top: 40px;
+  width: 90%;
+  left: 5%;
+  right: 5%;
+  height: 40vh;
+  background-color: var(--base-bg);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-y: auto;
   z-index: 1000;
+}
+
+@media (min-width: 769px) {
+  .container {
+    width: 30%;
+    right: 20px;
+    left: auto;
+  }
 }
 
 .headerLayout {
@@ -24,6 +31,7 @@
   background-color: var(--background-dark);
   flex-shrink: 0;
 }
+
 .back {
   border: none;
   cursor: pointer;
@@ -31,12 +39,13 @@
   align-items: center;
   justify-content: center;
   padding: 4px 8px;
-  color: #666;
   transition: all 0.2s ease;
 }
+
 .back:hover {
   background-color: var(--base-bg-onHover);
 }
+
 .header {
   flex: 1;
   font-weight: 600;
@@ -50,6 +59,7 @@
   min-height: 0;
   overflow: hidden;
 }
+
 .messages {
   flex: 1;
   min-height: 0;
@@ -63,24 +73,25 @@
 .message {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;  /* выравнивание по верхнему краю */
+  align-items: baseline;
+  flex-wrap: wrap;
   padding: 6px 12px;
   background-color: var(--base-bg);
   border-radius: 12px;
-  max-width: 100%;         /* не выходит за пределы */
+  max-width: 100%; /* не выходит за пределы */
+  gap: 8px;
 }
 
 .messageUsername {
-  flex-shrink: 0;          /* имя не сжимается */
+  flex-shrink: 0; /* имя не сжимается */
   font-weight: bold;
   color: #0b0b0b;
 }
 
 .messageText {
-  flex: 1;                 /* текст занимает оставшееся место */
-  word-break: break-word;  /* перенос длинных слов */
+  word-break: break-word; /* перенос длинных слов */
   overflow-wrap: break-word; /* перенос на новую строку */
-  white-space: normal;      /* разрешаем перенос строк */
+  white-space: normal; /* разрешаем перенос строк */
   color: #0b0b0b;
 }
 
@@ -122,6 +133,7 @@
   padding: 1rem;
   border-radius: 0.75rem;
 }
+
 .dialog {
   display: flex;
   position: relative;
@@ -131,12 +143,13 @@
   gap: 0.75rem;
   align-items: center;
   margin-top: 1rem;
-  background: var(--base-bg);
+  background: var(--base-bg-onHover);
   animation: shimmer 2s infinite linear;
   cursor: pointer;
 }
-.dialog:hover{
-  background: var(--base-bg-onHover);
+
+.dialog:hover {
+  background: var(--background-white);
 }
 
 
@@ -159,12 +172,14 @@
   border-radius: 0.5rem;
   font-size: 1rem;
 }
+
 .checkDialog {
   position: absolute;
   top: -1.25rem;
   left: 0.25rem;
   padding: -0.25rem 0.75rem;
 }
+
 .msg {
   color: black;
   overflow: hidden;
@@ -193,19 +208,20 @@
 }
 
 
-
-
 @media (max-width: 768px) {
   .containerGroupDialogs {
     padding: 0.75rem;
   }
+
   .dialog {
     padding: 0.5rem 0.75rem;
   }
+
   .user {
     font-size: 0.8rem;
     padding: 0.2rem 0.6rem;
   }
+
   .msg {
     font-size: 0.75rem;
   }

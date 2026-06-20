@@ -1,45 +1,25 @@
 import React from "react";
 import './clientMsgBubble.css';
-import { UserCircle2, Bot, Shield, Clock, User } from 'lucide-react';
-
-interface Message {
-  message: string;
-  username?: string;
-  timestamp: Date;
-  isOwn?: boolean;
-  type?: string;
-  fileUrl?: string;
-  mimeType?: string;
-  isButton?: boolean;
-}
+import {UserCircle2, Bot, Shield, Clock, User} from 'lucide-react';
+import type {ClientMessage} from "../interfaces.tsx"
 
 interface ClientMessageBubbleProps {
-  message: Message;
+  message: ClientMessage;
+  clientName: string;
   onBotMessageClick?: (text: string) => void;
-  username?: string;
   ws?: WebSocket;
+  username?: string;
 }
 
-export const ClientMessageBubble = ({ message, onBotMessageClick, username, ws }: ClientMessageBubbleProps) => {
+export const ClientMessageBubble = ({message, onBotMessageClick, ws, clientName}: ClientMessageBubbleProps) => {
 
-  // Определяем тип отправителя
-  const getSenderType = (): string => {
-    if (message.isOwn && !message.fileUrl) return 'client';
-    if (message.username === 'Система' || message.type === 'greeting' || message.type === 'advertising') return 'system';
-    if (message.username === 'Bot' || message.type === 'bot_message') return 'bot';
-    if (message.type === 'media' || message.fileUrl) return message.isOwn ? 'media-outgoing' : 'media-incoming';
-    return 'operator';
-  };
-
-  const senderType = getSenderType();
-  const isSystem = senderType === 'system';
-  const isBot = senderType === 'bot';
-  const isClient = senderType === 'client';
-  const isOperator = senderType === 'operator';
-  const isMediaOutgoing = senderType === 'media-outgoing';
-  const isMediaIncoming = senderType === 'media-incoming';
-  const isIncoming = !message.isOwn && (isOperator || isBot);
-  const isOutgoing = message.isOwn || isClient || isMediaOutgoing;
+  const isBot = message.type === 'bot' || message.type === 'connect_confirm';
+  const isClient = message.type === 'client';
+  const isOperator = message.type === 'operator';
+  const isMedia = message.type === 'media';
+  // incoming - входящее(не мое), outgoing - исходящее(мое)
+  // const isIncoming = !message.isOwn && isOperator;
+  // const isOutgoing = message.isOwn || isClient || isMediaOutgoing;
 
   const formatTime = (date: Date): string => {
     return date.toLocaleTimeString('ru-RU', {
@@ -56,70 +36,54 @@ export const ClientMessageBubble = ({ message, onBotMessageClick, username, ws }
 
   const handleButtonClick = (e: React.MouseEvent): void => {
     e.stopPropagation();
-    if (ws && username) {
+    if (ws && clientName) {
       ws.send(JSON.stringify({
         message: message.message,
-        from: username,
+        from: clientName,
       }));
     }
   };
 
-  const renderIconLeft = () => {
-    if (isOperator) {
-      return <UserCircle2 className="icon-size-md icon-purple" />;
-    }
-    if (isBot) {
-      return <Bot className="icon-size-md icon-emerald" />;
-    }
-    if (isSystem) {
-      return <Shield className="icon-size-sm icon-gray" />;
-    }
-    return null;
-  };
-
   const renderMediaContent = () => {
-    if (!message.fileUrl) return null;
-
-    const mediaUrl = `http://localhost:8000${message.fileUrl}`;
-
-    if (message.mimeType?.startsWith('image')) {
+    if (!message.file_url) return null;
+    console.log("🔍 renderMediaContent:", {
+        file_url: message.file_url,
+        mime_type: message.mime_type,
+        startsWithImage: message.mime_type?.startsWith('images'),
+        startsWithVideo: message.mime_type?.startsWith('video')
+    });
+    if (message.mime_type?.startsWith('image')) {
       return (
         <div className="media-content">
-          <img src={mediaUrl} alt="изображение" className="media-image" />
+          <img src={message.file_url} alt={message.id} className="media-image"/>
         </div>
       );
     }
 
-    if (message.mimeType?.startsWith('video')) {
+    if (message.mime_type?.startsWith('video')) {
       return (
         <div className="media-content">
-          <video src={mediaUrl} controls className="media-video" />
+          <video src={message.file_url} controls className="media-video"/>
         </div>
       );
     }
 
     return (
       <div className="media-content">
-        <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className="media-link">
+        <a href={message.file_url} target="_blank" rel="noopener noreferrer" className="media-link">
           📎 Скачать файл
         </a>
       </div>
     );
   };
 
-  // Системное сообщение
-  if (isSystem) {
+  // Сообщение бота
+  if (isBot) {
     return (
-      <div className="system-message-container">
-        <div className="system-message-bubble">
-          <Shield className="icon-size-lg icon-gray" />
-          <div className="system-message-content">
-            <div className="message-text white">{message.message}</div>
-            <div className="system-message-time">
-              <Clock className="icon-size-sm" />
-              {formatTime(message.timestamp)}
-            </div>
-          </div>
+      <div className="bot-message">
+        <Bot className="icon-bot" size={24}/>
+        <div className="bot-message-text">
+          {message.message}
         </div>
       </div>
     );
@@ -127,57 +91,42 @@ export const ClientMessageBubble = ({ message, onBotMessageClick, username, ws }
 
   // Обычное сообщение
   return (
-    <div className={`message-wrapper ${senderType}`}>
-      <div className="message-inner">
-
-        {/* Иконка слева (входящие) */}
-        {isIncoming && renderIconLeft() && (
-          <div className={`icon-left ${senderType}`}>
-            {renderIconLeft()}
-          </div>
-        )}
-        {/* Контент сообщения */}
-        <div>
-          {/* Имя отправителя */}
-          {isIncoming && (
-            <div className="sender-name">
-              {message.username}
+    <div className={`message-wrapper ${message.isOwn ? 'outgoing' : 'incoming'}`}>
+      {isOperator && (
+        <div className="icon">
+          <UserCircle2 className="icon-size-md icon-purple" size={24}/>
+        </div>
+      )}
+      <div>
+        <div className="sender-name">
+          {!message.isOwn ? message.operator : clientName}
+        </div>
+        <div className="message-bubble" onClick={handleBotClick}>
+          {isMedia && (
+            renderMediaContent()
+          )}
+          {message.isButton ? (
+            <button className="message-button" onClick={handleButtonClick}>
+              {message.message}
+            </button>
+          ) : (
+            <div className="message-text">
+              {message.message}
             </div>
           )}
-
-          {/* Пузырь сообщения */}
-          <div className={`message-bubble ${senderType}`} onClick={handleBotClick}>
-
-            {/* Медиа контент */}
-            {renderMediaContent()}
-
-            {/* Текст или кнопка */}
-            {message.isButton ? (
-              <button className="message-button" onClick={handleButtonClick}>
-                {message.message}
-              </button>
-            ) : (
-              <div className="message-text white">
-                {message.message}
-              </div>
-            )}
-
-            {/* Время */}
-            <div className={`message-time ${senderType}`}>
-              <Clock className="icon-size-sm" />
-              {formatTime(message.timestamp)}
+          {!message.isOwn && (
+            <div className="message-time">
+              <Clock className="icon-size-sm"/>
+              {formatTime(message.created_at)}
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Иконка справа (исходящие) */}
-        {isOutgoing && (
-          <div className="icon-right">
-            <User className="icon-size-md icon-blue" />
-          </div>
-        )}
-
       </div>
+      {message.isOwn && (
+        <div className="icon">
+          <User className="icon-size-md icon-blue"/>
+        </div>
+      )}
     </div>
   );
 };

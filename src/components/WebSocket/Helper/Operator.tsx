@@ -8,7 +8,7 @@ import {loadClients} from "../utils/OperatorHelper/loadClients.tsx";
 import {OperatorMessageBubble} from "../utils/operatorMessageBubble.tsx";
 
 
-export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps) {
+export default function ChatOperator({isOpen, operatorName, onClose}: OperatorPanelProps) {
   const [messages, setMessages] = useState<Record<string, OperatorMessage[]>>({});
   const [inputValue, setInputValue] = useState('')
   const [clients, setClients] = useState<Client[]>([])
@@ -45,7 +45,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
         const data = JSON.parse(event.data);
         console.log('Получено сообщение:', data);
 
-        if (data.type === 'client_message' && !data.file_url && !data.media_url) {
+        if (data.type === 'client') {
           const newMessage: OperatorMessage = {
             id: Date.now().toString() + Math.random(),
             message: data.message || '',
@@ -68,42 +68,33 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
             );
           }
         }
-        if (data.type == "notify_connect") {
-          console.log('🔔 Новый клиент:', data.from);
+        if (data.type == "connect_request") {
           const newClient = data.from
-
           setClients(prev => {
             const exists = prev.some(c => c.username === data.from);
             if (exists) {
-              console.log('Клиент уже есть в списке');
               return prev;
             }
-            console.log('➕ Добавляем нового клиента:', data.from);
             return [...prev, {
               username: newClient,
               isActive: true,
               unreadCount: 1
             }];
           });
-          const newMessage: OperatorMessage = {
-            id: Date.now().toString() + Math.random(),
-            message: 'Новый клиент нуждается в помощи',
-            username: newClient,
-            timestamp: new Date(),
-            is_own: false,
-            type: "notify_connect"
-          };
-
-          setMessages((prev) => ({
-            ...prev,
-            [data.from]: [...(prev[data.from] || []), newMessage],
-          }));
           loadClients({setClients}).catch(err => console.error('Ошибка загрузки клиентов:', err));
+          const confirmConnect = ({
+            "type": "connect_confirm",
+            "from": operatorName,
+            "to": data.from,
+            "message": `Operator ${operatorName} has joined chat!`
+          })
+          ws?.send(JSON.stringify(confirmConnect))
+          console.log('Подтверждение о подключении отправлено клиенту')
         } else if (data.type == "media") {
           console.log(data.type)
           const newMessage: OperatorMessage = {
             id: Date.now().toString() + Math.random(),
-            message: data.message || '',
+            message: data.message,
             username: data.from,
             timestamp: new Date(),
             is_own: false,
@@ -116,7 +107,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
             ...prev,
             [data.from]: [...(prev[data.from] || []), newMessage],
           }));
-        } else if (data.type == 'notify_disconnect') {
+        } else if (data.type == 'disconnect') {
           setClients(prev => prev.filter(c => c.username !== data.from));
           setMessages(prev => {
             const newMessages = {...prev};
@@ -145,6 +136,15 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
 
   }, [selectedClient])
 
+  const handleAcceptConnect = (username: string) => {
+    const acceptConnect = ({
+      "type": "accept_client",
+      "from": operatorName,
+      "to": username
+    })
+    ws?.send(JSON.stringify(acceptConnect))
+  }
+
   // Отправка сообщения
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,6 +169,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
     }
 
     const messageData: any = {
+      type: mediaUrl ? 'media' : 'operator',
       message: inputValue || '',
       from: operatorName,
       to: selectedClient,
@@ -212,7 +213,7 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
           <h3>Чат оператора</h3>
           <p>{operatorName} • {isConnect ? 'Подключен' : 'Не подключен'}</p>
         </div>
-        <button onClick={onclose} className={styles.closeBtn}>
+        <button onClick={onClose} className={styles.closeBtn}>
           ✕
         </button>
       </div>
@@ -226,7 +227,10 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
           clients.map((client) => (
             <button
               key={client.username}
-              onClick={() => setSelectedClient(client.username)}
+              onClick={() => {
+                setSelectedClient(client.username);
+                handleAcceptConnect(client.username)
+              }}
               className={`${styles.clientItem} ${selectedClient === client.username ? styles.clientItemActive : ''}`}
             >
               <div className={styles.clientInfo}>
@@ -248,10 +252,8 @@ export default function ChatOperator({isOpen, operatorName}: OperatorPanelProps)
           ))
         )}
       </div>
-
       <div className={styles.chatArea}>
         {!selectedClient ? (
-
           <div className={styles.noClientMessage}>Выберите клиента для начала общения</div>
         ) : (
           <>

@@ -5,10 +5,8 @@ const LoginModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleLogin = () => {
-    // Логика редиректа на страницу логина
     window.location.href = '/login';
-    // или используйте navigate если есть роутинг
-    // navigate('/login');
+
   };
 
   return (

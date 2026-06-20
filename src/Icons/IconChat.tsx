@@ -5,25 +5,18 @@ interface Envelope3DIconProps {
   size?: number;
   color?: string;
   className?: string;
-  hasNotification?: boolean;  // true = есть новое сообщение
+  hasNotification?: boolean;
 }
+
 
 export const Envelope3DIcon: React.FC<Envelope3DIconProps> = ({
   size = 32,
   color = "#c67c4e",
   className = "",
-  hasNotification = false
+  hasNotification
 }) => {
-  const [showDot, setShowDot] = useState(hasNotification);
-
-  // Эффект пульсации при появлении уведомления
-  useEffect(() => {
-    if (hasNotification) {
-      setShowDot(true);
-      // Можно добавить звук или вибрацию
-      console.log('🔔 Новое сообщение!');
-    }
-  }, [hasNotification]);
+  console.log('rerender icon')
+  console.log('value new msg from icon', hasNotification)
 
   return (
     <div
@@ -119,7 +112,7 @@ export const Envelope3DIcon: React.FC<Envelope3DIconProps> = ({
 
       {/* Анимированная точка уведомления */}
       <AnimatePresence>
-        {showDot && (
+        {hasNotification && (
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
