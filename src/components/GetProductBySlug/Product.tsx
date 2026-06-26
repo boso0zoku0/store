@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import api from "../../utils/auth.tsx";
 
 export interface DescriptionField {
@@ -36,7 +35,7 @@ export default function useProductBySlug(slug: string | null | undefined) {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { data } = await api.get(`/products/get/product/?slug=${slug}`);
+        const { data } = await api.get(`/product/get/?slug=${slug}`);
         setProductBySlug(data);
         console.log(data)
       } catch (error) {

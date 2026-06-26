@@ -117,7 +117,7 @@ export default function ShoppingCart() {
               <img
                 src={
                   item.Products?.photos && item.Products.photos.length > 0
-                    ? `/api/static/media/${item.Products.photos[0]}`
+                    ? item.Products.photos[0]
                     : '/placeholder.jpg'
                 }
                 alt={item.Products?.shortName}

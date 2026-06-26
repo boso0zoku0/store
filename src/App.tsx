@@ -21,6 +21,7 @@ import WSFriendlyProvider from "./contexts/SocketFriendly.tsx";
 import {useMediaQuery} from 'react-responsive';
 import {useEffect, useState} from "react";
 import CartMobile from "./components/Cart/CartMobile.tsx";
+import ProductDetails from "./components/ProductDetails/ProductDetails.tsx";
 
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                   <Route path="/modal" element={<ModalPurchase isOpen={true} onClose={''} title={'qwwq'}/>}/>
                   <Route path="/page" element={<Layers/>}/>
                   <Route path="/products" element={<Products/>}/>
+                  <Route path="/product/:id" element={<ProductDetails />} />
                   <Route path="/checkout" element={<Checkout/>}/>
                   <Route path={"/cart"} element={isMobile ? <CartMobile/> : <Cart/>}/>
                   <Route path={"/nav"} element={<Navigation/>}/>
