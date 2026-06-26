@@ -15,7 +15,6 @@ import ProductFilters from "./components/ProductFulter/Filter.tsx";
 import Register from "./components/Auth/Registrations/Registrations.tsx";
 import {AuthProvider} from "./contexts/Auth.tsx";
 import Layout from "./components/Layout.tsx";
-import {LeftSidebar} from "./learn/Learn.tsx";
 import {WsNotifyProvider} from "./contexts/SocketNotify.tsx";
 import WSFriendlyProvider from "./contexts/SocketFriendly.tsx";
 import {useMediaQuery} from 'react-responsive';
@@ -47,7 +46,6 @@ function App() {
                   <Route path={"/login"} element={<Login/>}/>
                   <Route path={"/register"} element={<Register/>}/>
                   {/*<Route path={"/"} element={<Hero/>}/>*/}
-                  <Route path={"/l"} element={<LeftSidebar/>}/>
                   <Route path="/f" element={<ProductFilters onFilterChange={() => {
                   }}/>}/>
                 </ Route>
