@@ -66,7 +66,7 @@ export function CartItem({onRemove, name, price, photo}: CartItemProps) {
       className={`${styles.prodWrap} ${isRemoving ? styles.removing : ''} ${isSwiping ? styles.swiping : ''}`}
       style={{
         transform: `translateX(${swipeX}px)`,
-        backgroundImage: photo ? `url("/api/static/media/${photo}")` : undefined
+        backgroundImage: photo ? `url(${photo})` : undefined
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

@@ -155,24 +155,24 @@ export default function Profile() {
                       <div key={`${order.id}-${index}`} className={styles.orderCard}>
                         <div className={styles.orderHeader}>
                           <div className={styles.orderInfo}>
-                    <span className={styles.orderDate}>
-                      <Clock size={14}/>
-                      {formatDate(order.created_at)}
-                    </span>
+                            <span className={styles.orderDate}>
+                              <Clock size={14}/>
+                              {formatDate(order.created_at)}
+                            </span>
                             <span className={`${styles.orderStatus} ${styles[order.status]}`}>
-                      {order.status === 'completed' && 'Доставлен'}
+                              {order.status === 'completed' && 'Доставлен'}
                               {order.status === 'moving' && 'В пути'}
                               {order.status === 'processing' && 'Обрабатывается'}
                               {order.status === 'cancelled' && 'Отменен'}
                               {order.status === 'none' && 'В очереди'}
-                    </span>
+                            </span>
                           </div>
                           <span className={styles.orderTotal}>
-                    {(order.price ?? 0).toLocaleString()} ₽
-                  </span>
+                            {(order.price ?? 0).toLocaleString()} ₽
+                          </span>
                         </div>
                         <div className={styles.orderItem}>
-                          <img src={`/api/static/media/${order.photo[0]}`} alt={order.short_name}
+                          <img src={order.photo[0]} alt={order.short_name}
                                className={styles.orderImage}/>
                           <div className={styles.orderDetails}>
                             <h4>{order.short_name}</h4>
@@ -240,7 +240,7 @@ export default function Profile() {
                           </div>
                         </div>
                         <div className={styles.orderItem}>
-                          <img src={`/api/static/media/${order.photo[0]}`} alt={order.short_name}
+                          <img src={order.photo[0]} alt={order.short_name}
                                className={styles.orderImage}/>
                           <div className={styles.orderDetails}>
                             <h4>{order.short_name}</h4>
@@ -254,7 +254,6 @@ export default function Profile() {
             </>
           )}
         </div>
-
       </div>
       {isOpenChat && id && (
         <WsFriendly isOpen={isOpenChat} onClose={() => setIsOpenChat(false)} to_user={id}/>

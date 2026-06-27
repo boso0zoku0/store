@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import styles from './shoppingCart.module.css';
+import styles from './Cart.module.css';
 import {showToast} from "../ToastCheckout/Toast.tsx";
 import type {CartItem} from "./interfaces.tsx";
 import api, {isAuthenticated} from "../../utils/auth.tsx";

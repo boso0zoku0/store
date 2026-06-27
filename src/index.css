@@ -12,7 +12,7 @@
   --accent-border: rgba(0, 0, 0, 0.5);
   --general-background: #111111;
   --transparent-bg: rgba(36, 36, 36, 0.29);
-
+  --bg-dark-gray: rgba(209, 209, 209, 0.47);
   --base-bg: rgb(150, 144, 144);
   --base-bg-onHover: rgba(255, 249, 249, 0.33);
 
@@ -147,7 +147,10 @@
 .btn-buy:active {
   transform: translateY(0);
 }
-
+.button-container {
+  border-radius: 40px;  /* ← такой же, как у кнопки */
+  overflow: hidden;     /* ← чтобы свечение не вылезало */
+}
 .button {
   width: 100%;
   padding: 14px 24px;
@@ -155,7 +158,7 @@
   border: none;
   border-radius: 40px;
   color: white;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -163,7 +166,6 @@
 }
 @media (max-width: 768px) {
   .button {
-    font-size: 0.5rem;
     font-weight: 500;
   }
 }
@@ -171,11 +173,9 @@
   color: #1f2028;
   background: var(--accent-border);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--accent-border);
 }
 .button:active {
   transform: translateY(0);
-  box-sizing: border-box;  /* 👈 padding внутри ширины */
 }
 * {
   box-sizing: border-box;
@@ -189,6 +189,9 @@ ul, ol {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+li {
+  color: inherit;  /* ← li наследуют цвет от родителя */
 }
 
 /* ========== БЕЗ ЗАСЕЧЕК (SANS-SERIF) ========== */

@@ -1,11 +1,11 @@
-import { memo, useState } from 'react';
+import {memo, useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   openModal,
   truncateText
 } from '../Products/utils';
 import type {CartItem} from "../interfaces.tsx";
-
+import './ProductCard.css'
 interface ProductCardProps {
   product: CartItem;
   isMobile: boolean;
@@ -24,6 +24,15 @@ const ProductCard = memo(({
   const navigate = useNavigate();
 
   const photos = product.photos || [];
+  console.log(`rerender productCard`)
+  // Загружаем фото товаров еще до взаимодействия с юзером, когда листаем фото, они не подгружаются дополнительно
+  // (не сильно критично, и так ок)
+  useEffect(() => {
+    photos.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [photos]);
 
   const onMouseEnter = () => setIsHovering(true);
   const onMouseLeave = () => {

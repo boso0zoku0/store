@@ -33,7 +33,7 @@ export default function Products() {
     inStock: true,
   });
   const isMobile = useMediaQuery({maxWidth: 768})
-  console.log('rerender')
+  console.log('rerender products')
 
   const {data: products, isLoading} = useQuery<CartItem[]>({
     queryKey: ['products', filters, priceFilterEnabled],
@@ -80,14 +80,19 @@ export default function Products() {
 
   return (
     <>
-      {products && products.map((product) => (
-        <ProductCard
-          product={product}
-          isMobile={isMobile}
-          setOpenedProduct={setOpenedProduct}
-          setOpenModalProduct={setOpenModalProduct}
-        />
-      ))}
+      <div className='catalogLayout'>
+        <div className='productsGrid'>
+          {products && products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              isMobile={isMobile}
+              setOpenedProduct={setOpenedProduct}
+              setOpenModalProduct={setOpenModalProduct}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Модальное окно */}
       {!isMobile && isOpenModalProduct && openedProduct && (

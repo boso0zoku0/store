@@ -78,7 +78,7 @@ export default function ProfileMobile() {
           <div key={index} className={styles.containerContentBtnH}>
             <div className={styles.layoutColumn}>
               <aside className={styles.headerBtnH}>{order.short_name}</aside>
-              <img alt="product" className={styles.productImg} src={`/api/static/media/${order.photo[0]}`}/>
+              <img alt="product" className={styles.productImg} src={order.photo[0]}/>
             </div>
             {isOwnProfile && (
               <>
